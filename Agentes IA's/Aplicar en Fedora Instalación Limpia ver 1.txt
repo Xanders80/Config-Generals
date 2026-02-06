@@ -1,0 +1,252 @@
+Instalar y Configurar despues de instalar Fedora 42. Todos estos procesos es en CLI modo sudo
+Configurar Terminal: https://starship.rs/
+
+#Mostrar Asteriscos al escribir Contraseña
+nano /etc/sudoers
+
+Actualizar la siguiente Linea:
+Defaults        env_reset,pwfeedback
+
+#-------------------------------------->
+Agregar repositorios adicionales
+
+*---RPM Fusion
+
+dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+*---Terra Repo
+
+dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+
+*---openh264
+
+sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1
+
+*---Microsoft
+rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+sh -c 'echo -e "[packages-microsoft-com-prod]\nname=packages-microsoft-com-prod\nbaseurl=https://packages.microsoft.com/fedora/42/prod/ \nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc " > /etc/yum.repos.d/microsoft.repo'
+
+sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode \nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc " > /etc/yum.repos.d/vscode.repo'
+
+dnf copr enable aleasto/waydroid #Opcional en caso de que la de Discover no Funcione
+#-------------------------------------->
+
+Una vez agregado los repositorios, verificar en Discover y activar los repositorios necesarios;
+configurar que se utilicen los repositorios más rápidos y permitir varias descargas al mismo tiempo
+
+nano /etc/dnf/dnf.conf
+fastestmirror=true
+max_parallel_downloads=5
+deltarpm=true
+
+#-------------------------------------->
+dnf group upgrade core
+
+Reiniciar el PC
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# colocar LibreOffece en Español
+dnf install libreoffice-langpack-es
+
+# Instalar compresores de archivos
+dnf -y install xz bzip2 unrar p7zip p7zip-plugins lbzip2 arj lzma arj lzop cpio webp-pixbuf-loader unar file-roller nginx
+
+# Instalar el módulo del kernel KVM de virtualización
+dnf group install -y --with-optional virtualization
+
+usermod -aG kvm $USER
+usermod -aG libvirt $USER
+usermod -aG libvirt $(whoami)
+systemctl start libvirtd
+systemctl enable libvirtd
+---------------------------------------------
+
+# 6. Configurar Git
+git config --global user.name "Xanders80"
+git config --global user.email "xanders80@gmail.com"
+git config --global --list
+---------------------------------------------
+
+# Instalar Herramientas para la Aceleración por Hardware
+dnf install vainfo intel-gpu-tools -y
+intel_gpu_top
+
+H/W VDecodificación de vídeo con VA-API
+dnf install ffmpeg-libs libva libva-utils -y --allowerasing --best
+
+Intel
+Si tiene un chipset Intel reciente (5a Gen y superior) después de instalar los paquetes anteriores., Haga:
+dnf swap libva-intel-media-driver intel-media-driver --allowerasing -y
+dnf install -y libva-intel-driver
+
+dnf group install -y --with-optional multimedia
+
+dnf install -y --allowerasing --best ffmpeg-free mesa-va-drivers-freeworld gstreamer1-vaapi libavcodec-freeworld openh264 gstreamer1-plugin-openh264 mozilla-openh264
+
+dnf config-manager setopt fedora-cisco-openh264.enabled=1
+
+En algunos casos, puede ser necesario configurar variables de entorno del sistema para usar el driver adecuado
+(por ejemplo, LIBVA_DRIVER_NAME=iHD para Intel).
+
+echo 'export LIBVA_DRIVER_NAME=iHD' | sudo tee /etc/profile.d/libva.sh
+echo 'export LIBVA_DRIVER_NAME=iHD' | tee ~/.config/plasma-workspace/env/libva.sh
+chmod +x ~/.config/plasma-workspace/env/libva.sh
+
+rm -f /usr/lib64/firefox/browser/defaults/preferences/firefox-redhat-default-prefs.js
+---------------------------------------------
+
+#custom DNS servers
+sudo mkdir -p '/etc/systemd/resolved.conf.d' && sudo -e '/etc/systemd/resolved.conf.d/99-dns-over-tls.conf'
+
+[Resolve]
+DNS=1.1.1.2#security.cloudflare-dns.com 1.0.0.2#security.cloudflare-dns.com 2606:4700:4700::1112#security.cloudflare-dns.com 2606:4700:4700::1002#security.cloudflare-dns.com
+DNSOverTLS=yes
+---------------------------------------------
+
+# Instalar .NET Core
+
+dnf install dotnet-sdk-9.0 -y
+
+dotnet --list-sdks
+dotnet --list-runtimes
+---------------------------------------------
+
+# Java JDK
+
+dnf group install -y --with-optional java-development
+---------------------------------------------
+
+# Instalar el compilador GCC
+dnf group install -y --allowerasing --best --with-optional c-development
+dnf install -y \
+    cmake \
+    clang \
+    ninja-build \
+    libtool \
+    mesa-libGL-devel \
+    openssl-devel \
+    zlib-devel \
+    ncurses-devel \
+    readline-devel \
+    systemd-devel
+
+---------------------------------------------
+
+# Instalar VSCode, NodeJS
+Instala VS Code:
+dnf install -y code
+---------------------------------------------
+
+# Instalar NodeJS
+# Descarga e instala nvm:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+
+# en lugar de reiniciar la shell
+\. "$HOME/.nvm/nvm.sh"
+
+# Descarga e instala Node.js:
+nvm install 24
+
+# Verifica la versión de Node.js:
+node -v # Debería mostrar "v24.3.0".
+nvm current # Debería mostrar "v24.3.0".
+
+# Verifica versión de npm:
+npm -v # Debería mostrar "11.4.2".
+---------------------------------------------
+
+# Instalar y validar PHP
+
+dnf group install -y --with-optional php
+dnf install -y php-sqlite3 \
+    php-curl \
+    php-zip \
+    php-intl \
+    php-redis \
+    php-bcmath
+
+nano /etc/php.ini  # Reemplaza 8.x por tu versión
+
+Buscar las opciones de configuración y actualizar
+display_errors = On
+error_reporting = E_ALL
+memory_limit = 256M
+upload_max_filesize = 128M
+post_max_size = 128M
+opcache.enable=1  # Mejora rendimiento
+opcache.memory_consumption=256
+opcache.interned_strings_buffer=32
+
+#Configurar Apache
+dnf install httpd -y
+systemctl start php-fpm
+systemctl status php-fpm
+systemctl enable --now httpd php-fpm
+
+# Instalar Composer (Gestor de Dependencias)
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+php -r "unlink('composer-setup.php');"
+
+echo "<?php phpinfo();" | sudo tee /var/www/html/info.php
+Abre un navegador y accede a http://localhost/info.php
+---------------------------------------------
+
+# Bases de Datos y Herramientas Adicionales MySQL/MariaDB:
+
+dnf group install -y --with-optional mysql
+systemctl start mariadb
+systemctl enable --now mariadb
+mysql_secure_installation
+
+#PostgreSQL:
+
+dnf group install -y --with-optional sql-server
+postgresql-setup --initdb
+systemctl start postgresql
+systemctl enable --now postgresql
+
+sudo su - postgres
+psql
+\password postgres
+#o en su defecto
+ALTER USER postgres WITH PASSWORD 'you_secure-password';
+
+Abre el archivo pg_hba.conf con un editor de texto. Este archivo generalmente se encuentra en el directorio de datos de PostgreSQL (/var/lib/pgsql/data/), comúnmente en /var/lib/pgsql/data/.
+Busca las líneas que definen la autenticación para conexiones locales y replication y cámbialas a md5 o trust
+local   all             all                                     md5
+host    all             all             127.0.0.1/32            md5
+host    all             all             ::1/128                 md5
+local   replication     all                                     md5
+host    replication     all             127.0.0.1/32            md5
+host    replication     all             ::1/128                 md5
+
+systemctl stop postgresql
+systemctl start postgresql
+---------------------------------------------
+
+# Instalar Waydroid
+dnf install -y waydroid
+
+waydroid init -s GAPPS -c https://ota.waydro.id/system -v https://ota.waydro.id/vendor
+
+systemctl start waydroid-container
+systemctl enable waydroid-container
+waydroid session start
+---------------------------------------------
+
+python3 -m pip install --upgrade pip
+---------------------------------------------
+
+Limpiar paquetes obsoletos de caché
+dnf clean dbcache
+Limpiar toda la caché de paquetes
+dnf clean packages
+Limpiar todo (caché + metadatos)
+sudo dnf clean all
+Eliminar dependencias no usadas
+sudo dnf autoremove
+Actualizar lista de paquetes
+sudo dnf makecache o dnf update
+---------------------------------------------

@@ -1,0 +1,208 @@
+Instalar y Configurar Kubuntu y sus derivados. Todos estos procesos es en CLI modo su
+Al iniciar validar esto:
+
+Para verificar si fstrim.timer está activo en Kubuntu 25.04, se puede usar el siguiente comando:
+systemctl status fstrim.timer
+
+Si no está habilitado, se puede activar con:
+systemctl enable fstrim.timer
+systemctl start fstrim.timer
+
+Para verificar el planificador de E/S actual de una partición (ej. /dev/sda):
+cat /sys/block/sda/queue/scheduler
+
+apt install -y ca-certificates curl gnupg
+
+#Mostrar Asteriscos al escribir Contraseña
+nano /etc/sudoers
+
+Actualizar la siguiente Linea:
+Defaults        env_reset,pwfeedback
+
+Agregar en root
+xandnew ALL=(ALL:ALL) ALL
+---------------------------------------------
+
+# Instalar y Configurar zram
+swapon --show  ----- validar si esta instalado ----
+free -h
+
+apt install zram-tools
+systemctl status zramswap.service
+systemctl enable zramswap.service
+systemctl start zramswap.service
+
+Reiniciar y validar
+Configurar según sea el caso
+nano /etc/default/zram-tools
+
+---------------------------------------------
+
+# Copiar las fuentes firacode y jetbrains en Fonts
+desde el Ajustes del Sistema->Texto y tipo de letras
+---------------------------------------------
+
+# Verificar si el módulo del kernel KVM de virtualización está cargado
+lsmod | grep kvm
+egrep -c '(vmx|svm)' /proc/cpuinfo
+
+dpkg -l | grep qemu-kvm
+apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
+usermod -aG kvm $USER
+usermod -aG libvirt $USER
+-- Reiniciar usuario o equipo
+
+systemctl start libvirtd
+systemctl enable libvirtd
+kvm-ok
+---------------------------------------------
+
+# Programas a Instalar desde la Tienda validar ultimas versiones
+Android Studio
+Code
+dbeaver-ce
+OpenJDK
+Retoques
+Herramientas de Red
+Mixxx ---> ver más abajo
+VLC
+---------------------------------------------
+
+# Instalar Mixxx
+add-apt-repository ppa:mixxx/mixxxbetas
+apt update
+apt install mixxx
+---------------------------------------------
+
+# Configurar Git
+git --version
+git config --global user.name "Xanders80"
+git config --global user.email "xanders80@gmail.com"
+git config --global --list
+---------------------------------------------
+
+# Instalar Herramientas para la Aceleración por Hardware
+apt install vainfo intel-gpu-tools -y
+intel_gpu_top
+
+Aplicar en Firefox
+En Ajuste desactivar rendimiento automático
+
+Abre una pestaña y escribe about:config, acepta el riesgo para acceder a la configuración avanzada.
+
+Cambia el valor de gfx.webrender.all a true para activar el motor de renderizado WebRender, que usa la GPU para gráficos.
+
+En algunos casos, puede ser necesario configurar variables de entorno del sistema para usar el driver adecuado
+(por ejemplo, LIBVA_DRIVER_NAME=iHD para Intel).
+
+Parámetros a modificar	              Valor	Función
+media.ffmpeg.vaapi.enabled	          True	Permite habilitar la aceleración gráfica por hardware VA-API con el decodificador de vídeo ffmpeg.
+media.ffvpx.enabled	                  False	Para deshabilitar el decodificador de vídeo FFVPX y de este modo asegurar que usaremos FFmpeg para la
+                                            decodificación de vídeo.
+media.av1.enabled	                  False	Para desactivar la reproducción de contenido de vídeo codificado con el códec AV1
+layers.acceleration.force-enabled	  True	Permite forzar la aceleración por hardware en nuestro navegador.
+media.rdd-vpx.enabled	              True	Es para habilitar la aceleración por hardware con el códec VP9. El valor que recomiendo es True,
+                                            pero si tienen una tarjeta gráfica que no es compatible con esté códec mejor que el valor sea False.
+---------------------------------------------
+
+Después de instalar Hardinfo2 vía paquete .deb, para dejar OpenGL Activo
+apt-mark manual libqt5opengl5t64
+---------------------------------------------
+
+# Configuración en profile colocar al final para Java
+nano /etc/profile
+
+# OpenJDK 17
+JAVA_HOME=/snap/openjdk/current/jdk
+PATH=$PATH:$HOME/bin:$JAVA_HOME/bin
+export JAVA_HOME
+export PATHgit --
+---------------------------------------------
+
+# Instalar .NET Core
+wget https://packages.microsoft.com/config/ubuntu/25.04/packages-microsoft-prod.deb
+nano /etc/apt/sources.list.d/microsoft-prod.list
+apt install --reinstall ca-certificates
+dpkg -i packages-microsoft-prod.deb
+apt update
+
+apt install -y dotnet-sdk-9.0
+
+dotnet --list-sdks
+dotnet --list-runtimes
+---------------------------------------------
+
+# Instalar el compilador GCC
+apt install -y gcc g++
+apt install -y make gdb build-essential
+---------------------------------------------
+
+# Instalar NodeJS
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+apt install -y nodejs
+---------------------------------------------
+
+# Instalar y validar PHP - Puedes agregar el repositorio de Ubuntu 24.04 a tu lista de fuentes de software
+nano /etc/apt/sources.list.d/ubuntu-24.04.list
+deb http://archive.ubuntu.com/ubuntu noble main restricted universe multiverse
+Instalar manualmente libzip4t64 desde el MSD Xanders\Descargas
+
+apt install php8.4 -y
+php --version
+apt install curl libapache2-mod-php php8.4-common php8.4-cli php8.4-mbstring php8.4-bcmath php8.4-fpm php8.4-mysql php8.4-zip php8.4-gd php8.4-curl php8.4-xml -y
+php -m
+
+curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+
+HASH=`curl -sS https://composer.github.io/installer.sig`
+
+php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+
+php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+nano /etc/php/8.4/cli/php.ini  # Reemplaza 8.x por tu versión
+
+Buscar las opciones de configuración y actualizar
+display_errors = On
+error_reporting = E_ALL
+memory_limit = 256M
+upload_max_filesize = 128M
+post_max_size = 128M
+opcache.enable=1  # Mejora rendimiento
+opcache.memory_consumption=256
+opcache.interned_strings_buffer=32
+
+echo "<?php phpinfo();" | sudo tee /var/www/html/info.php
+Abre un navegador y accede a http://localhost/info.php
+---------------------------------------------
+
+# Instalar mariaDB
+apt install mariadb-server
+
+systemctl status mariadb
+systemctl start mariadb
+systemctl enable mariadb
+
+# Cambiar Contraseña del Usuario 'root'
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'you_secure-password';
+FLUSH PRIVILEGES;
+
+salir de mariaDB
+/home/xandnew/.mysqlsh-gui/plugin_data/gui_plugin/web_certs/install.sh
+---------------------------------------------
+
+Aplicar de vez en cuando en CLI
+Limpieza básica de la caché de APT :
+    Usa sudo apt-get autoclean para eliminar los paquetes obsoletos de la caché, dejando solo los necesarios para actualizaciones
+
+Ejecuta sudo apt-get clean para borrar todos  los archivos de la caché de APT, liberando más espacio
+
+Eliminar paquetes y dependencias no utilizadas :
+    Ejecuta sudo apt-get autoremove para quitar paquetes de dependencias instaladas previamente pero ahora innecesarias (común después de desinstalar programas)
+
+Limpiar archivos residuales de configuración :
+    Si quedan archivos de configuración de paquetes desinstalados, usa sudo apt-get purge $(dpkg --list | grep "^rc" | cut -d " " -f 3) para eliminarlos. Esto aplica a paquetes marcados como "configuración residual" (rc en dpkg)
+
+Actualizar la lista de paquetes :
+    Antes de realizar estos pasos, asegúrate de actualizar el índice de paquetes con sudo apt update
+---------------------------------------------

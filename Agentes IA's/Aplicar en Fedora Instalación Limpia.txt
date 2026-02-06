@@ -1,0 +1,344 @@
+Usar primero esto:
+https://rawcdn.githack.com/Xanders80/archivos-varios/d8501a5dd5ac81bd72c515c38204fae9d09473fc/Aplicar%20en%20CachyOS%20Instalaci%C3%B3n%20Limpia.html#postgresql
+
+Temporal: uso de disco HDD:
+sudo mount -t ntfs-3g /dev/sdb1 /mnt
+
+sudo mount -t ntfs-3g -o force /dev/sdb1 /mnt
+
+Instalar y Configurar despues de instalar Fedora 42. Todos estos procesos es en CLI modo sudo
+
+Configurar Terminal: https://starship.rs/
+curl -sS https://starship.rs/install.sh | sh
+
+#Add the following to the end of ~/.bashrc:
+eval "$(starship init bash)"
+
+starship preset nerd-font-symbols -o ~/.config/starship.toml
+
+#Mostrar Asteriscos al escribir Contraseña
+nano /etc/sudoers
+
+Actualizar la siguiente Linea:
+Defaults        env_reset,pwfeedback
+
+Configurar zram
+nano /etc/systemd/zram-generator.conf
+zram-size = min(ram / 2, 8192)
+compression-algorithm = zstd
+swap-priority = 100
+fs-type = swap
+
+#-------------------------------------->
+Agregar repositorios adicionales
+
+*---RPM Fusion
+
+dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+*---Terra Repo
+
+dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+
+*---openh264
+
+sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1
+
+*---Microsoft
+rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+sh -c 'echo -e "[packages-microsoft-com-prod]\nname=packages-microsoft-com-prod\nbaseurl=https://packages.microsoft.com/fedora/42/prod/ \nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc " > /etc/yum.repos.d/microsoft.repo'
+
+sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode \nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc " > /etc/yum.repos.d/vscode.repo'
+
+dnf copr enable aleasto/waydroid #Opcional en caso de que la de Discover no Funcione
+#-------------------------------------->
+
+Una vez agregado los repositorios, verificar en Discover y activar los repositorios necesarios;
+configurar que se utilicen los repositorios más rápidos y permitir varias descargas al mismo tiempo
+
+nano /etc/dnf/dnf.conf
+fastestmirror=true
+max_parallel_downloads=5
+deltarpm=true
+
+#-------------------------------------->
+dnf group upgrade core -y
+
+Reiniciar el PC
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# Instalar compresores de archivos
+dnf -y install xz bzip2 unrar p7zip p7zip-plugins lbzip2 arj lzma arj lzop cpio webp-pixbuf-loader unar nginx
+
+# Instalar el módulo del kernel KVM de virtualización
+dnf group install -y --with-optional virtualization
+
+usermod -aG kvm $USER
+usermod -aG libvirt $USER
+usermod -aG libvirt $(whoami)
+systemctl start libvirtd
+systemctl enable libvirtd
+---------------------------------------------
+
+# 6. Configurar Git
+git config --global user.name "Xanders80"
+git config --global user.email "xanders80@gmail.com"
+git config --global --list
+---------------------------------------------
+
+# Instalar Herramientas para la Aceleración por Hardware
+dnf install vainfo intel-gpu-tools -y
+intel_gpu_top
+
+H/W VDecodificación de vídeo con VA-API
+dnf install ffmpeg-libs libva libva-utils -y --allowerasing --best
+
+Intel
+Si tiene un chipset Intel reciente (5a Gen y superior) después de instalar los paquetes anteriores., Haga:
+dnf swap libva-intel-media-driver intel-media-driver --allowerasing -y
+dnf install -y libva-intel-driver
+
+dnf group install -y --with-optional multimedia
+
+dnf install -y --allowerasing --best ffmpeg-free mesa-va-drivers-freeworld gstreamer1-vaapi libavcodec-freeworld openh264 gstreamer1-plugin-openh264 mozilla-openh264
+
+dnf config-manager setopt fedora-cisco-openh264.enabled=1
+
+En algunos casos, puede ser necesario configurar variables de entorno del sistema para usar el driver adecuado
+(por ejemplo, LIBVA_DRIVER_NAME=iHD para Intel).
+
+echo 'export LIBVA_DRIVER_NAME=iHD' | sudo tee /etc/profile.d/libva.sh
+echo 'export LIBVA_DRIVER_NAME=iHD' | tee ~/.config/plasma-workspace/env/libva.sh
+chmod +x ~/.config/plasma-workspace/env/libva.sh
+
+---------------------------------------------
+Aplicar en Firefox
+En Ajuste desactivar rendimiento automático
+
+con about:support
+Busca la sección "HARDWARE_VIDEO_DECODING". Si dice "available by default", significa que VA-API está habilitado y funcionando. Si no, está deshabilitado o no disponible en tu hardware o configuración
+
+Abre una pestaña y escribe about:config, acepta el riesgo para acceder a la configuración avanzada.
+
+Cambia el valor de gfx.webrender.all a true para activar el motor de renderizado WebRender, que usa la GPU para gráficos.
+
+Parámetros a modificar                Valor	Función
+media.ffmpeg.vaapi.enabled            True	Permite habilitar la aceleración gráfica por hardware VA-API con el decodificador de vídeo ffmpeg.
+media.ffvpx.enabled                   False	Para deshabilitar el decodificador de vídeo FFVPX y de este modo asegurar que usaremos FFmpeg para la
+                                            decodificación de vídeo.
+media.av1.enabled                     False	Para desactivar la reproducción de contenido de vídeo codificado con el códec AV1
+layers.acceleration.force-enabled     True	Permite forzar la aceleración por hardware en nuestro navegador.
+media.rdd-vpx.enabled                 True	Es para habilitar la aceleración por hardware con el códec VP9. El valor que recomiendo es True,
+                                            pero si tienen una tarjeta gráfica que no es compatible con esté códec mejor que el valor sea False.
+gfx.wayland.hdr #No funciona en conjunto con media.hardware-video-decoding.enabled en true
+media.gmp-gmpopenh264.autoupdate
+media.gmp-gmpopenh264.enabled
+media.gmp-gmpopenh264.provider.enabled
+media.peerconnection.video.h264_enabled
+
+rm -f /usr/lib64/firefox/browser/defaults/preferences/firefox-redhat-default-prefs.js
+---------------------------------------------
+
+#custom DNS servers
+sudo mkdir -p '/etc/systemd/resolved.conf.d' && sudo -e '/etc/systemd/resolved.conf.d/99-dns-over-tls.conf'
+
+[Resolve]
+DNS=1.1.1.2#security.cloudflare-dns.com 1.0.0.2#security.cloudflare-dns.com 2606:4700:4700::1112#security.cloudflare-dns.com 2606:4700:4700::1002#security.cloudflare-dns.com
+DNSOverTLS=yes
+---------------------------------------------
+
+# Instalar .NET Core
+
+dnf install dotnet-sdk-9.0 -y
+
+dotnet --list-sdks
+dotnet --list-runtimes
+---------------------------------------------
+
+# Java JDK
+
+dnf group install -y --with-optional java-development
+---------------------------------------------
+
+# Instalar el compilador GCC
+dnf group install -y --allowerasing --best --with-optional c-development
+dnf install -y \
+    cmake \
+    clang \
+    ninja-build \
+    libtool \
+    mesa-libGL-devel \
+    openssl-devel \
+    zlib-devel \
+    ncurses-devel \
+    readline-devel \
+    systemd-devel
+
+---------------------------------------------
+
+# Instalar VSCode, NodeJS
+Instala VS Code:
+dnf install -y code
+---------------------------------------------
+
+# Instalar NodeJS
+# Descarga e instala nvm:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+
+# en lugar de reiniciar la shell
+\. "$HOME/.nvm/nvm.sh"
+
+# Descarga e instala Node.js:
+nvm install 24
+
+# Verifica la versión de Node.js:
+node -v # Debería mostrar "v24.3.0".
+nvm current # Debería mostrar "v24.3.0".
+
+# Verifica versión de npm:
+npm -v # Debería mostrar "11.4.2".
+---------------------------------------------
+
+# Instalar y validar PHP
+
+dnf group install -y --with-optional php
+dnf install -y php-sqlite3 \
+    php-curl \
+    php-zip \
+    php-intl \
+    php-redis \
+    php-bcmath
+
+nano /etc/php.ini  # Reemplaza 8.x por tu versión
+
+Buscar las opciones de configuración y actualizar
+display_errors = On
+error_reporting = E_ALL
+memory_limit = 256M
+upload_max_filesize = 128M
+post_max_size = 128M
+opcache.enable=1  # Mejora rendimiento
+opcache.memory_consumption=256
+opcache.interned_strings_buffer=32
+
+#Configurar Apache
+dnf install httpd -y
+systemctl start php-fpm
+systemctl status php-fpm
+systemctl enable --now httpd php-fpm
+
+# Instalar Composer (Gestor de Dependencias)
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+php -r "unlink('composer-setup.php');"
+
+echo "<?php phpinfo();" | sudo tee /var/www/html/info.php
+Abre un navegador y accede a http://localhost/info.php
+---------------------------------------------
+
+# Bases de Datos y Herramientas Adicionales MySQL/MariaDB:
+
+dnf group install -y --with-optional mysql
+systemctl start mariadb
+systemctl enable --now mariadb
+mysql_secure_installation
+
+#PostgreSQL:
+
+dnf group install -y --with-optional sql-server
+postgresql-setup --initdb
+systemctl enable --now postgresql
+
+sudo su - postgres
+psql
+ALTER USER postgres WITH PASSWORD 'you_secure-password';
+
+Abre el archivo pg_hba.conf con un editor de texto. Este archivo generalmente se encuentra en el directorio de datos de PostgreSQL (/var/lib/pgsql/data/), comúnmente en /var/lib/pgsql/data/.
+Busca las líneas que definen la autenticación para conexiones locales y replication y cámbialas a md5 o trust
+local   all             all                                     md5
+host    all             all             127.0.0.1/32            md5
+host    all             all             ::1/128                 md5
+local   replication     all                                     md5
+host    replication     all             127.0.0.1/32            md5
+host    replication     all             ::1/128                 md5
+
+# Cambiar Contraseña del Usuario 'root'
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'you_secure-password';
+FLUSH PRIVILEGES;
+---------------------------------------------
+
+# Instalar Waydroid
+dnf install -y waydroid
+
+waydroid init -s GAPPS -c https://ota.waydro.id/system -v https://ota.waydro.id/vendor
+
+systemctl start waydroid-container
+systemctl enable waydroid-container
+waydroid session start
+---------------------------------------------
+
+# colocar LibreOffece en Español
+dnf install libreoffice-langpack-es
+
+# Actualizar Android Studio manualmente
+sudo -E /opt/android-studio/bin/studio.sh
+
+# Validad internet en Waydroid CachyOS
+1. Detener la sesión y el contenedor de Waydroid:
+sudo waydroid session stop
+sudo waydroid container stop
+
+2. Permitir el tráfico DNS de Waydroid:
+sudo ufw allow 67
+sudo ufw allow 53
+
+3. Permitir el reenvío de paquetes:
+sudo ufw default allow FORWARD
+sudo waydroid session start
+waydroid show-full-ui
+
+
+# Instalar libhoudini para las instalaciones apk #https://github.com/casualsnek/waydroid_script
+
+git clone https://github.com/casualsnek/waydroid_script
+cd waydroid_script
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
+python3 -m pip install --upgrade pip
+sudo venv/bin/python3 main.py
+
+---------------------------------------------
+
+# Programas a Instalar desde la Tienda validar ultimas versiones
+hardinfo2
+guvcview
+bleachbit
+dbeaver-ce
+Herramientas de Red
+Easy Effects
+Mixxx
+MusicBrainz Picard
+Waydroid
+Yakuake
+
+Configurar Apariencia KDE
+Estilo de Plasma: Kdewaita
+Decoraciones de las ventanas: Clay
+Iconos: Win11-nord-dark
+Cursores: Vimix Cursores
+Pantalla de Bienvenida: Vinyl
+
+---------------------------------------------
+
+Limpiar paquetes obsoletos de caché
+dnf clean dbcache
+Limpiar toda la caché de paquetes
+dnf clean packages
+Limpiar todo (caché + metadatos)
+sudo dnf clean all
+Eliminar dependencias no usadas
+sudo dnf autoremove
+Actualizar lista de paquetes
+sudo dnf makecache o dnf update
+---------------------------------------------

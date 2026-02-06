@@ -1,0 +1,134 @@
+# Configurar Terminal (Starship)
+sh -c "$(curl -fsSL https://starship.rs/install.sh )" -- -y
+echo 'eval "$(starship init bash)"' >> ~/.bashrc
+
+# Mostrar Asteriscos al escribir Contraseña
+sudo nano /etc/sudoers
+# Actualizar la siguiente línea:
+Defaults        env_reset,pwfeedback
+
+# Agregar Repositorios Adicionales
+sudo pacman -Sy
+# **Multimedia y Propietarios**
+sudo pacman -Syyu
+sudo pacman -S jdk8-openjdk jdk17-openjdk  # Repositorio oficial para Java
+sudo pacman -Syyu --needed base-devel
+
+# **RPM Fusion (Equivalente en Manjaro)**
+# Manjaro incluye repositorios multimedia por defecto, pero se pueden activar:
+sudo pacman -Syyu
+sudo pacman -S lib32-vulkan-intel lib32-vulkan-radeon vulkan-tools libva-intel-driver
+
+# **Repositorios de Terceros (Ejemplos)**
+# Microsoft (Visual Studio Code)
+sudo pacman-key --recv-keys 5243CB24D5044A6DA23BDC1A03C9532F359D8BBB
+echo "[packages-microsoft-com-prod]
+Server = https://packages.microsoft.com/manjaro/25/prod " | sudo tee -a /etc/pacman.conf
+sudo pacman -Syu code
+
+# Configurar pacman.conf
+sudo nano /etc/pacman.conf
+# Agregar al final del archivo:
+[extra]
+Include = /etc/pacman.d/mirrorlist
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+
+# Ajustes de pacman para velocidad
+sudo nano /etc/pacman.conf
+# Agregar o modificar:
+ParallelDownloads = 5
+ILoveCandy
+
+# Actualizar Sistema
+sudo pacman -Syu --needed --noconfirm
+
+# Instalar Herramientas Básicas
+sudo pacman -S --needed xz bzip2 unrar p7zip arj lbzip2 lzop cpio webp-pixbuf-loader file-roller nginx
+
+# Instalar Módulo de Virtualización (KVM)
+sudo pacman -S --needed qemu virt-manager libvirt edk2-ovmf dnsmasq vde2
+sudo usermod -aG libvirt $USER
+sudo usermod -aG kvm $USER
+sudo systemctl enable --now libvirtd
+
+# Configurar Git
+git config --global user.name "Xanders80"
+git config --global user.email "xanders80@gmail.com"
+
+# Aceleración por Hardware (VA-API)
+sudo pacman -S --needed libva-intel-driver intel-media-driver ffmpeg-libs gstreamer1-vaapi
+echo 'export LIBVA_DRIVER_NAME=iHD' | sudo tee /etc/profile.d/libva.sh
+echo 'export LIBVA_DRIVER_NAME=iHD' | tee ~/.config/plasma-workspace/env/libva.sh
+chmod +x ~/.config/plasma-workspace/env/libva.sh
+
+# Firefox Aceleración
+# En about:config:
+# - media.ffmpeg.vaapi.enabled → true
+# - media.ffvpx.enabled → false
+# - media.av1.enabled → false
+# - layers.acceleration.force-enabled → true
+# - media.rdd-vpx.enabled → true
+sudo rm -f /usr/lib/firefox/browser/defaults/preferences/firefox-manjaro-default-prefs.js
+
+# DNS (Cloudflare con DoT)
+sudo mkdir -p /etc/systemd/resolved.conf.d
+sudo nano /etc/systemd/resolved.conf.d/99-dns-over-tls.conf
+# Contenido:
+[Resolve]
+DNS=1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com
+DNSOverTLS=yes
+sudo systemctl restart systemd-resolved
+
+# .NET Core
+sudo pacman -S dotnet-sdk
+dotnet --list-sdks
+
+# Java JDK
+sudo pacman -S jdk-openjdk
+
+# Compiladores y Desarrollo
+sudo pacman -S --needed base-devel cmake clang ninja libtool openssl zlib ncurses readline systemd-devel
+
+# VSCode y NodeJS
+# VSCode ya se instala con el repositorio de Microsoft
+# NodeJS con NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh  | bash
+source ~/.bashrc
+nvm install 24
+node -v
+npm -v
+
+# PHP y Servidores Web
+sudo pacman -S php php-fpm php-apache
+sudo pacman -S apache httpd
+sudo systemctl enable --now httpd php-fpm
+sudo nano /etc/php/php.ini
+# Ajustar configuraciones como:
+display_errors = On
+memory_limit = 256M
+# Instalar Composer
+curl -sS https://getcomposer.org/installer  | sudo php -- --install-dir=/usr/local/bin --filename=composer
+
+# Bases de Datos
+# MariaDB
+sudo pacman -S mariadb
+sudo systemctl enable --now mariadb
+sudo mysql_secure_installation
+
+# PostgreSQL
+sudo pacman -S postgresql
+sudo postgresql-setup initdb
+sudo systemctl enable --now postgresql
+
+# Paquetes Adicionales desde la Tienda
+sudo pacman -S hardinfo guvcview bleachbit dbeaver-wayland waydroid yakuake
+
+# Configuración Final
+# Limpiar caché
+sudo pacman -Sc
+sudo pacman -Scc
+
+# Ajustes de KDE Plasma
+# (Se asume que el usuario ya tiene KDE instalado)

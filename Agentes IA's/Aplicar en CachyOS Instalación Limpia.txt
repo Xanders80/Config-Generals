@@ -1,0 +1,446 @@
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+Configurar Apariencia KDE
+Estilo de Plasma: Kdewaita
+Decoraciones de las ventanas: Clay
+Iconos: Win11-nord-dark
+Cursores: Vimix Cursores
+Pantalla de Bienvenida: Vinyl
+
+#Mostrar Asteriscos al escribir Contraseña
+sudo nano /etc/sudoers
+
+Agregar la siguiente Linea:
+Defaults        env_reset,pwfeedback
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+Instalar y Configurar despues de instalar CachyOS. Todos estos procesos es en CLI modo sudo
+
+Configurar Terminal: https://starship.rs/
+
+sudo pacman -S starship
+
+# Bash Add the following to the end of ~/.bashrc:
+eval "$(starship init bash)"
+
+# Fish Add the following to the end of ~/.config/fish/config.fish:
+starship init fish | source
+
+# Zsh Add the following to the end of ~/.zshrc:
+eval "$(starship init zsh)"
+
+starship preset nerd-font-symbols -o ~/.config/starship.toml
+https://github.com/starship/starship/discussions/1107 -- Otras configuraciones para .TOML
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+Agregar repositorios adicionales
+
+# Actualizar sistema base primero
+sudo pacman -Syu
+
+# Instalar llaves y mirrorlist de Chaotic AUR
+sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+sudo pacman-key --lsign-key 3056513887B78AEB
+sudo pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+
+# Editar pacman.conf
+sudo nano /etc/pacman.conf
+# --- Añadir al final ---
+[chaotic-aur]
+Include = /etc/pacman.d/chaotic-mirrorlist
+# ---------------------
+
+# Instalar helper de AUR (Paru) y refrescar mirrors para asegurarte de que tienes los mirrors más rápidos/actualizados:
+sudo pacman -S paru --needed
+sudo pacman -Syyu cachyos-mirrorlist
+
+# Refresca la base de datos de paquetes:
+sudo pacman -Syyu
+
+Cambiar Kernel a deckify-lto y actualizar el flag del programador flash y lowlattency
+
+Reiniciar el PC en caso de haber actualizaciones
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# Instalar Desde Octopi
+
+# Generales
+cachyos-firefox-settings ntfs-3g sshfs hardinfo2 guvcview bleachbit isoimagewriter kcharselect kolourpaint okular partitionmanager gnome-nettool easyeffects mixxx vlc picard lbzip2 arj lzop cpio webp-pixbuf-loader libreoffice waydroid
+intel-gpu-tools gstreamer-vaapi libva-intel-driver libva-utils qemu-base qemu-img virt-manager virt-viewer vde2 bridge-utils openbsd-netcat edk2-ovmf libosinfo swtpm virtiofsd libvirt speech-dispatcher telegram
+
+# Programación
+antigravity visual-studio-code-bin dbeaver dotnet jdk-openjdk nodejs php php-redis composer mariadb postgresql wordpress
+opcional: android-studio android-sdk android-sdk-platform-tools android-emulator
+
+# Juegos
+mednafen mednaffe dolphin-emu-git desmume-avx-git stella ppsspp-avx-git scummvm citron mupen64plus
+# Con Paru
+azaharplus-appimage mupen64plus-qt
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+#Configurar Firewall en Waydroid y KDEConect CachyOS
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Permitir tráfico Web (Puerto 80 y 443 para SSL)
+sudo ufw allow http
+sudo ufw allow https
+
+# Si usas SSH para acceder desde otro equipo, descomenta la siguiente línea:
+sudo ufw allow ssh
+
+# KDE Connect
+sudo ufw allow 1714:1764/tcp
+sudo ufw allow 1714:1764/udp
+
+# Waydroid DNS/DHCP
+sudo ufw allow in on waydroid0 to any port 53 proto udp
+sudo ufw allow in on waydroid0 to any port 67 proto udp
+
+# SSH (opcional)
+sudo ufw allow 22/tcp
+
+sudo ufw enable
+sudo systemctl enable ufw
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# Configurar el módulo del kernel KVM de virtualización
+sudo nano /etc/libvirt/libvirtd.conf
+
+Descomenta (quita el #) estas líneas:
+unix_sock_group = "libvirt"
+unix_sock_rw_perms = "0770"
+
+# Configurar parámetros específicos Comet Lake en GRUB
+sudo nano /etc/default/grub
+
+# Línea GRUB_CMDLINE_LINUX_DEFAULT (reemplaza la existente):
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash intel_pstate=active intel_idle.max_cstate=2 i915.enable_guc=3 i915.enable_fbc=1 i915.max_vfs=7 mitigations=off nowatchdog nmi_watchdog=0 modprobe.blacklist=pcspkr"
+
+# Regenerar GRUB
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+sudo usermod -aG libvirt,kvm $USER
+sudo usermod -aG libvirt $(whoami)
+sudo systemctl start libvirtd
+sudo systemctl enable --now libvirtd
+
+Reiniciar y probar
+sudo virt-host-validate
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# 6. Configurar Git
+git config --global user.name "Xanders80"
+git config --global user.email "xanders80@gmail.com"
+git config --global --list
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# Validar Herramientas para la Aceleración por Hardware
+sudo intel_gpu_top
+
+echo 'export LIBVA_DRIVER_NAME=iHD' | sudo tee /etc/profile.d/libva.sh
+
+source /etc/profile.d/libva.sh
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# Verificar .NET Core
+
+dotnet --list-sdks
+dotnet --list-runtimes
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+#Configurar archivo PHP
+sudo nano /etc/php/php.ini
+
+memory_limit = 2G
+display_errors = On
+error_reporting = E_ALL
+upload_max_filesize = 256M
+post_max_size = 256M
+opcache.enable=1
+opcache.memory_consumption=512
+opcache.interned_strings_buffer=64
+opcache.max_accelerated_files=20000
+opcache.revalidate_freq=0
+opcache.validate_timestamps=1  ; 0 en producción, 1 en dev
+
+#Buscar y descomentar esta línea: pdo_mysql, bcmath y mysqli
+
+# Editar /etc/httpd/conf/httpd.conf
+# Descomentar estas líneas
+
+LoadModule mpm_event_module modules/mod_mpm_event.so
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so
+
+#Configurar Apache
+#Agregar estas líneas (adaptadas para tu PHP actual):
+
+AddHandler php-script .php
+ServerName localhost
+Include conf/extra/php-fpm.conf
+
+# Configuración del Handler (El "Puente") Crea o edita el archivo
+sudo nano /etc/httpd/conf/extra/php-fpm.conf
+
+# Incluir al archivo
+<FilesMatch \.php$>
+    # Conexión mediante Unix Socket (más rápido que TCP)
+    SetHandler "proxy:unix:/run/php-fpm/php-fpm.sock|fcgi://localhost/"
+</FilesMatch>
+
+# Priorizar index.php
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+</IfModule>
+
+
+# Reiniciar para aplicar cambios drásticos de MPM
+sudo systemctl start httpd php-fpm
+
+# Asegurar persistencia
+sudo systemctl enable --now php-fpm httpd
+
+# Crear Archivo Info de PHP
+echo "<?php phpinfo();" | sudo tee /srv/http/info.php
+Abre un navegador y accede a http://localhost/info.php
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# Bases de Datos y Herramientas Adicionales MySQL/MariaDB:
+# --- MARIADB (configuración para 16GB) ---
+sudo mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+sudo systemctl enable mariadb --now
+sudo systemctl start mariadb
+
+sudo mariadb-secure-installation
+
+# Optimizar my.cnf para dev local (no producción)
+sudo nano /etc/my.cnf.d/optimization.cnf
+
+[mysqld]
+innodb_buffer_pool_size = 4G
+innodb_log_file_size = 512M
+innodb_flush_log_at_trx_commit = 2
+query_cache_size = 128M
+tmp_table_size = 256M
+max_heap_table_size = 256M
+key_buffer_size = 256M
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+#PostgreSQL:
+sudo -iu postgres
+initdb --locale=$LANG -E UTF8 -D '/var/lib/postgres/data'
+
+# Config PostgreSQL para 16GB (desde usuario postgres)
+sudo -iu postgres
+nano /var/lib/postgres/data/postgresql.conf
+
+# Ajustar:
+shared_buffers = 4GB
+effective_cache_size = 8GB
+maintenance_work_mem = 1GB
+work_mem = 256MB
+wal_buffers = 16MB
+
+exit
+
+sudo systemctl enable postgresql.service --now
+# Creación de usuario
+sudo -iu postgres
+psql
+ALTER USER postgres WITH PASSWORD 'you_secure-password';
+#----------------------------------------------------->
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# Configurar wordpress
+sudo mariadb
+CREATE DATABASE wordpress;
+CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'tu_contraseña_segura';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+
+# Copiar el archivo de configuración:
+
+cd wordpress
+cp wp-config-sample.php wp-config.php
+
+# Editar wp-config.php con el usuario, contraseña y database creados anteriormente:
+php
+define('DB_NAME', 'wordpress');
+define('DB_USER', 'wpuser');
+define('DB_PASSWORD', 'Wpu*123');
+define('DB_HOST', 'localhost');
+
+# Crea el archivo /etc/httpd/conf/extra/httpd-wordpress.conf con este contenido:
+
+Alias /wordpress "/usr/share/webapps/wordpress/"
+<Directory "/usr/share/webapps/wordpress/">
+    AllowOverride All
+    Options FollowSymlinks
+    Require all granted
+</Directory>
+
+# Luego, edita /etc/httpd/conf/httpd.conf (ubicación estándar en CachyOS/Arch) y agrega esta línea al final para incluir la configuración:
+
+Include conf/extra/httpd-wordpress.conf
+
+# Corrige permisos:
+sudo chown -R http:http /usr/share/webapps/wordpress/
+sudo chmod -R 755 /usr/share/webapps/wordpress/
+
+sudo systemctl status httpd
+
+# Desde un navegador web, entra a http://localhost/wordpress para finalizar la instalación mediante la interfaz gráfica (crear usuario admin, nombre del sitio, etc.)
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+# Configurar Waydroid con Límites de recursos (4GB RAM para Waydroid)
+
+sudo mkdir -p /etc/systemd/system/waydroid-container.service.d/
+sudo tee /etc/systemd/system/waydroid-container.service.d/override.conf << EOF
+[Service]
+# Aumentar memoria del contenedor de 2GB a 4GB
+# (50% de RAM física es seguro)
+MemoryMax=4G
+MemoryHigh=3.5G
+
+# Limitar swap (evitar I/O lento)
+MemorySwapMax=512M
+
+# Aumentar CPUs de 2 a 4 cores
+AllowedCPUs=0,1,2,3
+
+# Priorizar I/O (mejora carga de apps)
+IOWeight=500
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now waydroid-container
+
+# Instalar LibHoudini (traducción ARM) para las instalaciones apk
+cd ~
+git clone https://github.com/casualsnek/waydroid_script
+cd waydroid_script
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
+sudo systemctl stop waydroid-container
+sudo venv/bin/python3 main.py install libhoudini
+sudo systemctl start waydroid-container
+
+#----------------------------------------------------->
+
+# Sysctl (ajustes de red, VM e I/O)
+
+sudo nano /etc/sysctl.d/99-master-performance.conf
+
+# --- MEMORIA (16GB RAM) ---
+# Evita el swap prematuro y prioriza el uso de RAM física
+vm.swappiness=10
+# Equilibrio: No purgar caché de archivos demasiado rápido (ideal para IDEs/C++)
+vm.vfs_cache_pressure=50
+
+# --- I/O & WRITEBACK (SSD Optimizado) ---
+# Datos en RAM antes de forzar escritura al disco
+vm.dirty_background_ratio=5
+vm.dirty_ratio=15
+vm.dirty_expire_centisecs=300
+vm.dirty_writeback_centisecs=100
+
+# --- SCHEDULER (CachyOS BORE / Deckify) ---
+# Optimización de estados de energía y latencia de hilos
+kernel.sched_cstate_aware=1
+kernel.sched_child_runs_first=0
+kernel.sched_tunable_scaling=1
+kernel.numa_balancing=0
+
+# --- RED & CONECTIVIDAD (Dev + Waydroid/Server) ---
+# Manejo de ráfagas de conexiones locales
+net.core.somaxconn=1024
+net.core.netdev_max_backlog=65536
+net.core.default_qdisc=fq_codel
+net.ipv4.tcp_fastopen=3
+# Necesario para contenedores/Waydroid
+net.ipv4.ip_forward=1
+
+# --- RECURSOS DE USUARIO (IDEs & File Watching) ---
+# Evita errores de "too many open files" en VS Code/Compilaciones
+fs.inotify.max_user_watches=524288
+fs.inotify.max_user_instances=512
+
+# Guardar y Aplicar Cambios
+sudo sysctl --system
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+##Usar en la linea de comando del Acceso Director
+-c 'pasuspender -- taskset -c 1-2 chrt -f 95 mixxx || mixxx'
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+Aplicar en Firefox
+En Ajuste desactivar rendimiento automático
+Abre una pestaña y escribe about:config
+
+# Forzar WebRender (Motor gráfico moderno)
+gfx.webrender.all = true
+
+# Activar decodificación de video por hardware (VA-API)
+media.ffmpeg.vaapi.enabled = true
+
+# Codecs modernos
+media.av1.enabled = true
+media.ffvpx.enabled = false   # Desactivar decoder interno para forzar el del sistema (VA-API)
+media.rdd-vpx.enabled = false # Lo mismo para VP9/VP8
+
+# Desactivar caché en disco (SSD agradecido)
+browser.cache.disk.enable = false
+
+# Forzar caché en RAM y aumentar tamaño (1GB asignado)
+browser.cache.memory.enable = true
+browser.cache.memory.capacity = 1048576  # 1GB en KB
+
+# Protección contra rastreo (Modo Estricto moderno)
+privacy.trackingprotection.enabled = true
+network.cookie.cookieBehavior = 5  # Total Cookie Protection (Aisla cookies por sitio dinámicamente)
+
+# Apagar Telemetría (Cero datos a Mozilla)
+toolkit.telemetry.enabled = false
+toolkit.telemetry.archive.enabled = false
+browser.newtabpage.activity-stream.feeds.telemetry = false
+browser.ping-centre.telemetry = false
+datareporting.healthreport.uploadEnabled = false
+
+# DNS y Conexiones
+network.dns.disablePrefetch = false  # Mantenlo false para velocidad
+network.http.max-persistent-connections-per-server = 10
+network.http.pacing.requests.enabled = false
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+
+Temporal: uso de disco HDD:
+sudo mount -t ntfs-3g /dev/sdb1 /mnt
+
+sudo mount -t ntfs-3g -o force /dev/sdb1 /run/media/xanders/Bliblioteca\ de\ Juegos
+
+sudo mkdir -p "/run/media/xanders/Bliblioteca de Juegos"
+sudo mount -t ntfs-3g -o force /dev/sdb1 "/run/media/xanders/Bliblioteca de Juegos"
+
+UUID=55B81DDA497FCAAD "/run/media/xanders/Bliblioteca de Juegos" ntfs-3g defaults,noatime,users,umask=000 0 0
+
+Para poder acceder a esta pc desde remoto con VsCode
+https://vscode.dev/tunnel/dell-latitude-3410/run/media/xandnew/MSD Xanders/Documentos/Condominios-Vzla
+
+/home/xandnew/.local/share/azaharplus-emu/sdmc/
+#----------------------------------------------------->

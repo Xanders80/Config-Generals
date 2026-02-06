@@ -1,0 +1,45 @@
+{
+    "output": {
+        "blocklist": [],
+        "compressor": {
+            "bypass": false,
+            "mode": "Upward",
+            "ratio": 3.0,
+            "threshold": -20.0,
+            "release": 600.0,
+            "attack": 130.0,
+            "input-gain": 0.0,
+            "output-gain": 0.0
+        },
+        "crystalizer": {
+            "bypass": false,
+            "intensity": -3.0
+        },
+        "equalizer": {
+            "bypass": false,
+            "mode": "IIR",
+            "num-bands": 3,
+            "left": {
+                "band0": { "frequency": 80.0, "type": "High-pass", "mode": "RLC (BT)", "slope": "x2" },
+                "band1": { "frequency": 250.0, "gain": 1.5, "type": "Bell" },
+                "band2": { "frequency": 10000.0, "gain": 2.0, "type": "High-shelf" }
+            },
+            "right": {
+                "band0": { "frequency": 80.0, "type": "High-pass", "mode": "RLC (BT)", "slope": "x2" },
+                "band1": { "frequency": 250.0, "gain": 1.5, "type": "Bell" },
+                "band2": { "frequency": 10000.0, "gain": 2.0, "type": "High-shelf" }
+            }
+        },
+        "limiter": {
+            "bypass": false,
+            "lookahead": 2.0,
+            "threshold": -1.1
+        },
+        "plugins_order": [
+            "compressor",
+            "equalizer",
+            "crystalizer",
+            "limiter"
+        ]
+    }
+}

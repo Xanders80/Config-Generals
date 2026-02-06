@@ -1,0 +1,17 @@
+[21:27:59 ￼ PATH Información] /usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+[21:30:57 ￼ Cliente LSP Advertencia] No se ha podido encontrar el binario del servidor: bash-language-server
+Compruebe su PATH para el binario
+Consulte también https://github.com/bash-lsp/bash-language-server para instalación o detalles
+
+
+/opt/microsoft/msedge/microsoft-edge --profile-directory=Default --app-id=aioglfahffbnednffnodjbiiojbochai --app-url=https://copilot.microsoft.com/
+
+
+xdg-open
+https://office.live.com/start/Excel.aspx
+https://onedrive.live.com
+http://www.onenote.com/notebooks
+https://outlook.com/
+https://people.live.com/
+https://office.live.com/start/PowerPoint.aspx
+https://office.live.com/start/Word.aspx

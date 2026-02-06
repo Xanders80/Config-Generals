@@ -1,0 +1,161 @@
+Todos estos procesos es en Modo su
+
+# Copiar las fuentes firacode y jetbrains en Fonts
+cp -r "/media/xandnew/MSD Xanders/Descargados/firacode" /usr/share/fonts/truetype
+cp -r "/media/xandnew/MSD Xanders/Descargados/jetbrains-mono-zorin-os" /usr/share/fonts/truetype
+
+# Programas a Instalar desde la Tienda Snap
+Android Studio
+Code
+dbeaver-ce
+Gnome Boxes
+IPTV Smarters Expert
+mesa-2404
+MySQL Server
+msyql-workbench
+node
+OpenJDK
+pgadmin4
+Pinta
+Postman
+# Sección Debian
+Retoques
+Herramientas de Red
+Mixxx
+VLC
+
+# Instalar Herramientas para la Aceleración por Hardware
+apt install vainfo intel-gpu-tools -y
+intel_gpu_top
+
+gpuviewer
+    sudo add-apt-repository ppa:arunsivaraman/gpuviewer
+    sudo apt-get update
+    sudo apt-get install gpu-viewer
+
+gucview
+	sudo add-apt-repository --remove ppa:pj-assis/ppa
+	sudo apt-get update
+	sudo apt install guvcview
+
+# Instalar paquetes Debians en SD
+gucview
+hardinfo2
+
+# Activar información de Memoria RAM en Hardinfo2, aplicar y reiniciar equipo
+systemctl enable hardinfo2 --now
+usermod -a -G hardinfo2 xandnew
+
+# Mostrar o no en Escritorio, editar con nano en usr/share/aplications
+# Eliminar línea en python3.12.desktop
+# Agregar línea en org.gnome.SanpShot.desktop
+NoDisplay=true
+
+# Eliminar Camera
+apt remove gnome-snapshot -y
+apt purge gnome-snapshot -y
+apt autoremove
+apt clean
+
+# For capturing photo and video to `/mnt` or `/media` en gucview
+sudo snap connect guvcview:removable-media
+
+# Enable the "H264 Controls" tab, for the webcams that support H.264 hardware encoding en gucview
+sudo snap connect guvcview:hardware-observe
+
+# Configuración en profile colocar al final para Java 
+nano /etc/profile
+
+# OpenJDK 17
+JAVA_HOME=/snap/openjdk/current/jdk
+PATH=$PATH:$HOME/bin:$JAVA_HOME/bin
+export JAVA_HOME
+export PATHgit --
+
+# Instalar Git
+apt install git -y
+
+# Instalar .NET Core 
+apt update && \
+apt install -y dotnet-sdk-8.0
+  
+# Instalar y configurar PostgreSQL
+# Configuración automática del repositorio:
+apt install -y postgresql
+apt install -y postgresql-client
+systemctl status postgresql
+
+/home/xandnew# /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+
+# Cambiar Contraseña PostgreSQL
+su postgres
+psql
+alter user postgres with password 'you_secure-password';
+
+# Si todo ocurre normalmente, el programa deberá responder con el siguiente mensaje,
+ALTER ROLE’
+
+Salir de postgres
+\q
+
+# Instalar y validar PHP
+apt update -y && apt upgrade -y
+apt install ca-certificates apt-transport-https software-properties-common
+add-apt-repository ppa:ondrej/php
+apt update
+apt install php8.3 -y
+php --version
+apt install curl libapache2-mod-php php8.3-common php8.3-cli php8.3-mbstring php8.3-bcmath php8.3-fpm php8.3-mysql php8.3-zip php8.3-gd php8.3-curl php8.3-xml -y
+php -m
+
+curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+
+HASH=`curl -sS https://composer.github.io/installer.sig`
+
+php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+
+php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+# Validar PHP
+nano /var/www/html/info.php
+<?php
+    phpinfo();
+?>
+systemctl restart apache2
+
+# Configurar MySQL
+# Durante la instalación, se crea una contraseña generada aleatoriamente para el usuario de raíces MySQL. 
+# Puede recuperarlo usando el siguiente comando:
+mysql-strict.rootpass
+
+# Consejo: Para mayor comodidad, puede crear alias de comando usando la función de alias de Snapd.
+snap alias mysql-strict.mysql mysql
+snap alias mysql-strict.mysqladmin mysqladmin
+snap alias mysql-strict.mysqldump mysqldump
+snap alias mysql-strict.mysqlimport mysqlimport
+
+# De esta manera, ahora puede simplemente iniciar sesión en el servidor MySQL con sólo:
+ mysql -u root -p
+ 
+# Cambiar Contraseña del Usuario 'root'
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'you_secure-password';
+FLUSH PRIVILEGES;
+
+# Permisos para acceso a los medios extraíbles: "removable-media"
+snap connect mysql-workbench-community:removable-media
+
+# -------------------------------------------------------------------------------------------
+# NO APLICAR NO APLICAR NO APLICAR - SOLO FUNCIONA CON ARCHLINUX
+# Pantalla parpadeo / Forzo de cursor dañado (iGPU):
+Panel Self Refresh (PSR), una función de ahorro de energía utilizada por Intel iGPUs es conocida por causar parpadeo en algunos casos FS-49628 FS-49371 FS-5605. Una solución temporal es desactivar esta característica utilizando el parámetro del núcleo i915.enable_psr=0
+# Esto deshabilitará una función de ahorro de energía que principalmente está causando este problema.
+# Grub bootloadloader:
+# Para habilitarlo de la manera más fácil, es configurarlo en la comida, añadiéndolo a la lista GRUB-CMDLINE-LINUX-DEFAULT:
+sudo nano /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3 nowatchdog i915.enable_psr=0"
+# Guarde el archivo [Ctrl-x] y reconstruir grub.cfg:
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+https://linuxitos.com/main/que-hacer-despues-de-instalar-endeavouros/
+https://www.busindre.com/guia_rapida_y_completa_de_pacman_arch
+# -------------------------------------------------------------------------------------------

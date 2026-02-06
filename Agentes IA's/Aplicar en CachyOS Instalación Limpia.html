@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Configuración CachyOS - Post-Instalación</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/apache.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ff5f56, #ffbd2e, #27c93f);
+        }
+
+        .toc-link {
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+
+        .toc-link:hover,
+        .toc-link.active {
+            border-left-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            padding-left: 1rem;
+        }
+
+        .section-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(234, 179, 8, 0.05));
+            border-left: 4px solid #eab308;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+            border-left: 4px solid #3b82f6;
+        }
+
+        .command-prompt::before {
+            content: '$ ';
+            color: #27c93f;
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+    <base target="_blank">
+</head>
+
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-xl">
+                    C</div>
+                <h1 class="text-xl font-bold gradient-text">CachyOS Setup Guide</h1>
+            </div>
+            <div class="flex items-center space-x-4 text-sm text-slate-400">
+                <span class="hidden md:inline">Kernel: deckify-lto</span>
+                <span class="px-3 py-1 rounded-full bg-slate-800 border border-slate-700">16GB RAM</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8 flex gap-8">
+
+        <!-- Sidebar ToC -->
+        <aside class="hidden lg:block w-72 flex-shrink-0">
+            <div class="sticky top-24 glass-panel rounded-xl p-6 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Contenidos</h3>
+                <nav class="space-y-1" id="toc">
+                    <a href="#apariencia"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">1. Apariencia
+                        KDE</a>
+                    <a href="#terminal"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">2. Terminal &
+                        Starship</a>
+                    <a href="#repos" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">3.
+                        Repositorios</a>
+                    <a href="#paquetes"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">4. Instalación
+                        Paquetes</a>
+                    <a href="#firewall"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">5. Firewall</a>
+                    <a href="#kvm" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">6.
+                        Virtualización KVM</a>
+                    <a href="#git" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">7.
+                        Git Config</a>
+                    <a href="#hardware"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">8. Hardware
+                        Intel</a>
+                    <a href="#dotnet"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">9. .NET
+                        Core</a>
+                    <a href="#php" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">10.
+                        PHP & Apache</a>
+                    <a href="#mariadb"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">11. MariaDB</a>
+                    <a href="#postgresql"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">12.
+                        PostgreSQL</a>
+                    <a href="#wordpress"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">13.
+                        WordPress</a>
+                    <a href="#waydroid"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">14.
+                        Waydroid</a>
+                    <a href="#optimizacion"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">15.
+                        Optimización</a>
+                    <a href="#firefox"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">16. Firefox</a>
+                    <a href="#accesos" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">17. Accesos Directos</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0 space-y-12">
+
+            <!-- Intro -->
+            <div class="glass-panel rounded-2xl p-8 section-card">
+                <h2 class="text-4xl font-bold mb-4 gradient-text">Guía de Configuración Post-Instalación</h2>
+                <p class="text-slate-400 text-lg leading-relaxed">
+                    Configuración completa para CachyOS en entornos de desarrollo y producción personal.
+                    Optimizado para <span class="text-blue-400 font-semibold">Intel Comet Lake</span>,
+                    <span class="text-purple-400 font-semibold">16GB RAM</span> y
+                    <span class="text-green-400 font-semibold">Kernel deckify-lto</span>.
+                </p>
+            </div>
+
+            <!-- Sección 1 -->
+            <section id="apariencia" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg mr-4">1</span>
+                    <h2 class="text-2xl font-bold text-white">Configuración de Apariencia KDE</h2>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <h4 class="text-slate-400 text-sm uppercase tracking-wider mb-2">Tema Visual</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex justify-between"><span class="text-slate-300">Estilo Plasma:</span> <span
+                                    class="text-blue-400 font-mono">Kdewaita</span></li>
+                            <li class="flex justify-between"><span class="text-slate-300">Decoraciones:</span> <span
+                                    class="text-blue-400 font-mono">Clay</span></li>
+                            <li class="flex justify-between"><span class="text-slate-300">Iconos:</span> <span
+                                    class="text-blue-400 font-mono">Win11-nord-dark</span></li>
+                            <li class="flex justify-between"><span class="text-slate-300">Cursores:</span> <span
+                                    class="text-blue-400 font-mono">Vimix Cursores</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold text-white mb-3">Mostrar Asteriscos en Contraseña</h3>
+                <div class="code-block mb-4">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo nano /etc/sudoers</code></pre>
+                </div>
+                <p class="text-slate-400 mb-2">Agregar la línea:</p>
+                <div class="code-block mb-4">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-ini">Defaults        env_reset,pwfeedback</code></pre>
+                </div>
+            </section>
+
+            <!-- Sección 2 -->
+            <section id="terminal" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-lg mr-4">2</span>
+                    <h2 class="text-2xl font-bold text-white">Terminal y Starship</h2>
+                </div>
+
+                <div class="mb-6">
+                    <a href="https://starship.rs/" target="_blank"
+                        class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-white font-medium transition">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Documentación Starship
+                    </a>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Instalar Starship</h3>
+                <div class="code-block mb-6">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo pacman -S starship</code></pre>
+                </div>
+                <p class="text-slate-400 mb-2">Configurar Terminal:</p>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <h4 class="text-yellow-400 font-mono text-sm mb-2">Bash</h4>
+                        <p class="text-xs text-slate-400 mb-2">~/.bashrc</p>
+                        <code class="text-xs text-green-400">eval "$(starship init bash)"</code>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <h4 class="text-blue-400 font-mono text-sm mb-2">Fish</h4>
+                        <p class="text-xs text-slate-400 mb-2">~/.config/fish/config.fish</p>
+                        <code class="text-xs text-green-400">starship init fish | source</code>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <h4 class="text-cyan-400 font-mono text-sm mb-2">Zsh</h4>
+                        <p class="text-xs text-slate-400 mb-2">~/.zshrc</p>
+                        <code class="text-xs text-green-400">eval "$(starship init zsh)"</code>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-slate-800/30 rounded-lg border border-slate-700">
+                    <h4 class="text-white font-semibold mb-2">Tema Nerd Fonts</h4>
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">starship preset nerd-font-symbols -o ~/.config/starship.toml</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 3 -->
+            <section id="repos" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center font-bold text-lg mr-4">3</span>
+                    <h2 class="text-2xl font-bold text-white">Repositorios Adicionales</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-white mb-3">Actualizar sistema base primero</h3>
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">sudo pacman -Syu</code></pre>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-3">Instalar llaves y mirrorlist de Chaotic AUR</h3>
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+sudo pacman-key --lsign-key 3056513887B78AEB
+sudo pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'</code></pre>
+                        </code></pre>
+                    </div>
+
+                    <div class="warning-box p-4 rounded-lg">
+                        <h4 class="text-yellow-400 font-semibold mb-2 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg>
+                            Configuración pacman.conf
+                        </h4>
+                        <p class="text-slate-300 text-sm mb-2">Añadir al final de <code
+                                class="bg-slate-800 px-2 py-1 rounded">/etc/pacman.conf</code>:</p>
+                        <div class="code-block mb-4">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/pacman.conf</code></pre>
+                        </div>
+                        <div class="code-block bg-slate-900/50">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-ini">[chaotic-aur]
+Include = /etc/pacman.d/chaotic-mirrorlist</code></pre>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-3">Instalar helper de AUR (Paru) y refrescar mirrors
+                    </h3>
+
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">sudo pacman -S paru --needed
+sudo pacman -Syyu cachyos-mirrorlist
+sudo pacman -Syyu</code></pre>
+                    </div>
+
+                    <div class="info-box p-4 rounded-lg">
+                        <p class="text-blue-300 text-sm">
+                            <strong>Cambiar Kernel:</strong> Migrar a <code
+                                class="bg-blue-900/50 px-2 py-1 rounded">deckify-lto</code> y actualizar flags del
+                            programador (flash y lowlatency).
+                            <br><br>
+                            <span class="text-yellow-400">⚠️ Reiniciar el PC después de actualizar el kernel.</span>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 4 -->
+            <section id="paquetes" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center font-bold text-lg mr-4">4</span>
+                    <h2 class="text-2xl font-bold text-white">Instalación de Paquetes</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                                </path>
+                            </svg>
+                            Generales
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash">cachyos-firefox-settings ntfs-3g sshfs hardinfo2 guvcview bleachbit isoimagewriter kcharselect kolourpaint okular partitionmanager gnome-nettool easyeffects mixxx vlc picard lbzip2 arj lzop cpio webp-pixbuf-loader libreoffice waydroid intel-gpu-tools gstreamer-vaapi libva-intel-driver libva-utils qemu-base qemu-img virt-manager virt-viewer vde2 bridge-utils openbsd-netcat edk2-ovmf libosinfo swtpm virtiofsd libvirt speech-dispatcher telegram</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-purple-400 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                            </svg>
+                            Programación
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash">antigravity visual-studio-code-bin dbeaver dotnet jdk-openjdk nodejs php php-redis composer mariadb postgresql wordpress</code></pre>
+                        </div>
+                        <p class="text-slate-400 text-sm mt-2">Opcional: <code
+                                class="text-slate-300">android-studio android-sdk android-sdk-platform-tools android-emulator</code>
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-green-400 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Juegos
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="code-block">
+                                <pre><code class="language-bash">mednafen mednaffe dolphin-emu-git desmume-avx-git stella ppsspp-avx-git scummvm citron mupen64plus</code></pre>
+                            </div>
+                            <div class="bg-slate-800/50 p-3 rounded border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-2">Con Paru:</p>
+                                <code class="text-sm text-green-400">azaharplus-appimage mupen64plus-qt</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 5 -->
+            <section id="firewall" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-lg mr-4">5</span>
+                    <h2 class="text-2xl font-bold text-white">Configuración de Firewall</h2>
+                </div>
+
+                <div class="mb-4 p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                    <p class="text-orange-200 text-sm">Configuración UFW para Waydroid y KDE Connect</p>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Poíticas Wifi por defecto</h3>
+                <div class="code-block">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo ufw default deny incoming
+sudo ufw default allow outgoing</code></pre>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Tráfico Web</h3>
+                <div class="code-block">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo ufw allow http
+sudo ufw allow https</code></pre>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">SSH</h3>
+                <div class="code-block">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo ufw allow ssh
+sudo ufw allow 22/tcp</code></pre>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">KDE Connect</h3>
+                <div class="code-block">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo ufw allow 1714:1764/tcp
+sudo ufw allow 1714:1764/udp</code></pre>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Waydroid DNS/DHCP</h3>
+                <div class="code-block">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo ufw allow in on waydroid0 to any port 53 proto udp
+sudo ufw allow in on waydroid0 to any port 67 proto udp</code></pre>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Habilitar y persistir</h3>
+                <div class="code-block">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo ufw enable
+sudo systemctl enable ufw</code></pre>
+                </div>
+            </section>
+
+            <!-- Sección 6 -->
+            <section id="kvm" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-lg mr-4">6</span>
+                    <h2 class="text-2xl font-bold text-white">Virtualización KVM</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-3">Configurar libvirtd</h3>
+                        <div class="code-block mb-3">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/libvirt/libvirtd.conf</code></pre>
+                        </div>
+                        <p class="text-slate-400 mb-2">Descomentar:</p>
+                        <div class="code-block bg-slate-900/50">
+                            <pre><code class="language-ini">unix_sock_group = "libvirt"
+unix_sock_rw_perms = "0770"</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="warning-box p-4 rounded-lg">
+                        <h4 class="text-yellow-400 font-semibold mb-2">Parámetros Kernel (Comet Lake)</h4>
+                        <p class="text-slate-300 text-sm mb-2">Editar <code
+                                class="bg-slate-800 px-2 py-1 rounded">/etc/default/grub</code>:</p>
+                        <div class="code-block mb-3">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/default/grub</code></pre>
+                        </div>
+                        <p class="text-slate-400 mb-2">Buscar y reemplazar la línea:</p>
+                        <div class="code-block bg-slate-900/50">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">GRUB_CMDLINE_LINUX_DEFAULT="quiet splash intel_pstate=active intel_idle.max_cstate=2 intel_iommu=on iommu=pt i915.enable_guc=3 i915.enable_fbc=1 i915.max_vfs=7 mitigations=off nowatchdog nmi_watchdog=0 modprobe.blacklist=pcspkr"</code></pre>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-3">Aplicar configuración al GRUB</h3>
+                        <div class="code-block mt-2">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo grub-mkconfig -o /boot/grub/grub.cfg</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-3">Permisos y Servicio</h3>
+                        <div class="code-block">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo usermod -aG libvirt,kvm $USER
+sudo usermod -aG libvirt $(whoami)
+sudo systemctl start libvirtd
+sudo systemctl enable --now libvirtd
+reboot</code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-3">Validar después de Reiniciar</h3>
+                        <div class="code-block">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo virt-host-validate</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 7 -->
+            <section id="git" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-500/20 text-gray-400 flex items-center justify-center font-bold text-lg mr-4">7</span>
+                    <h2 class="text-2xl font-bold text-white">Configuración Git</h2>
+                </div>
+                <div class="code-block">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">git config --global user.name "Xanders80"
+git config --global user.email "xanders80@gmail.com"
+git config --global --list</code></pre>
+                </div>
+            </section>
+
+            <!-- Sección 8 -->
+            <section id="hardware" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-lg mr-4">8</span>
+                    <h2 class="text-2xl font-bold text-white">Aceleración por Hardware Intel</h2>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Validar Aceleración por Hardware Intel</h3>
+                <div class="code-block mb-4">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo intel_gpu_top</code></pre>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Crear archivo de configuración para Intel GPU</h3>
+                <div class="code-block">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">echo 'export LIBVA_DRIVER_NAME=iHD' | sudo tee /etc/profile.d/libva.sh
+source /etc/profile.d/libva.sh</code></pre>
+                </div>
+            </section>
+
+            <!-- Sección 9 -->
+            <section id="dotnet" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg mr-4">9</span>
+                    <h2 class="text-2xl font-bold text-white">.NET Core</h2>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Validar instalación de .NET Core</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">dotnet --list-sdks</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">dotnet --list-runtimes</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 10 -->
+            <section id="php" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center font-bold text-lg mr-4">10</span>
+                    <h2 class="text-2xl font-bold text-white">PHP y Apache</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-purple-400 mb-3">Configurar PHP</h3>
+                        <div class="code-block mb-3">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/php/php.ini</code></pre>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                                <h4 class="text-slate-300 font-semibold mb-2">Límites</h4>
+                                <ul class="text-sm space-y-1 text-slate-400 font-mono">
+                                    <li>memory_limit = 2G</li>
+                                    <li>upload_max_filesize = 256M</li>
+                                    <li>post_max_size = 256M</li>
+                                    <li>upload_max_filesize = 256M</li>
+                                    <li>post_max_size = 256M</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                                <h4 class="text-slate-300 font-semibold mb-2">OPcache</h4>
+                                <ul class="text-sm space-y-1 text-slate-400 font-mono">
+                                    <li>opcache.enable=1</li>
+                                    <li>opcache.memory_consumption=512</li>
+                                    <li>opcache.validate_timestamps=1</li>
+                                    <li>opcache.interned_strings_buffer=64</li>
+                                    <li>opcache.max_accelerated_files=20000</li>
+                                    <li>opcache.revalidate_freq=0</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="text-yellow-400 text-sm mb-2">⚠️ Descomentar: pdo_mysql, bcmath, mysqli</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-red-400 mb-3">Configurar Apache</h3>
+                        <div class="code-block mb-3">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/httpd/conf/httpd.conf</code></pre>
+                        </div>
+                        <p class="text-slate-400 mb-2">Descomentar:</p>
+                        <div class="code-block bg-slate-900/50 mb-3">
+                            <pre><code class="language-apache">LoadModule mpm_event_module modules/mod_mpm_event.so
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so</code></pre>
+                        </div>
+                        <p class="text-slate-400 mb-2">Agregar:</p>
+                        <div class="code-block bg-slate-900/50">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-apache">AddHandler php-script .php
+ServerName localhost
+Include conf/extra/php-fpm.conf</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-3">Configurar PHP-FPM</h3>
+                        <div class="code-block mb-3">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/httpd/conf/extra/php-fpm.conf</code></pre>
+                        </div>
+                        <p class="text-slate-400 mb-2">Agregar:</p>
+                        <div class="code-block bg-slate-900/50">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-apache">&lt;FilesMatch \.php$&gt;
+    SetHandler "proxy:unix:/run/php-fpm/php-fpm.sock|fcgi://localhost/"
+&lt;/FilesMatch&gt;
+
+&lt;IfModule dir_module&gt;
+    DirectoryIndex index.php index.html
+&lt;/IfModule&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="info-box p-4 rounded-lg">
+                        <h4 class="text-blue-400 font-semibold mb-2">Iniciar Servicios</h4>
+                        <div class="code-block bg-blue-900/20">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo systemctl start httpd php-fpm
+sudo systemctl enable --now php-fpm httpd</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 11 -->
+            <section id="mariadb" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-600/20 text-yellow-400 flex items-center justify-center font-bold text-lg mr-4">11</span>
+                    <h2 class="text-2xl font-bold text-white">MariaDB</h2>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Configuración de MariaDB - 1° Vez</h3>
+                <div class="code-block mb-6">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+sudo systemctl enable mariadb --now
+sudo systemctl start mariadb
+sudo mariadb-secure-installation</code></pre>
+                </div>
+
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-lg font-semibold text-yellow-400 mb-4">Optimización (16GB RAM)</h3>
+                    <p class="text-slate-400 mb-3 text-sm">Crear <code
+                            class="bg-slate-900 px-2 py-1 rounded">/etc/my.cnf.d/optimization.cnf</code>:</p>
+                    <div class="code-block mb-3">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">sudo nano /etc/my.cnf.d/optimization.cnf</code></pre>
+                    </div>
+                    <p class="text-slate-400 mb-2">Agregar:</p>
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-ini">[mysqld]
+innodb_buffer_pool_size = 4G
+innodb_log_file_size = 512M
+innodb_flush_log_at_trx_commit = 2
+query_cache_size = 128M
+tmp_table_size = 256M
+max_heap_table_size = 256M
+key_buffer_size = 256M</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 12 -->
+            <section id="postgresql" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-800/20 text-blue-300 flex items-center justify-center font-bold text-lg mr-4">12</span>
+                    <h2 class="text-2xl font-bold text-white">PostgreSQL</h2>
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-3">Configuración PostgreSQL - 1° Vez</h3>
+                <div class="space-y-4">
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">sudo -iu postgres
+initdb --locale=$LANG -E UTF8 -D '/var/lib/postgres/data'</code></pre>
+                    </div>
+
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <h4 class="text-blue-400 font-semibold mb-2">Configuración (16GB RAM)</h4>
+                        <p class="text-slate-400 text-sm mb-2">Editar <code
+                                class="bg-slate-900 px-2 py-1 rounded">/var/lib/postgres/data/postgresql.conf</code>:
+                        <div class="code-block mb-3">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /var/lib/postgres/data/postgresql.conf</code></pre>
+                        </div>
+                        </p>
+                        <p class="text-slate-400 mb-2">Ajustar:</p>
+                        <div class="code-block bg-slate-900/50">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-ini">shared_buffers = 4GB
+effective_cache_size = 8GB
+maintenance_work_mem = 1GB
+work_mem = 256MB
+wal_buffers = 16MB</code></pre>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-3">Habilitar Servicio PostgreSQL</h3>
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">exit
+sudo systemctl enable postgresql.service --now</code></pre>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-3">Creación de usuario PostgreSQL</h3>
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">sudo -iu postgres
+psql
+ALTER USER postgres WITH PASSWORD 'you_secure-password';</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 13 -->
+            <section id="wordpress" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg mr-4">13</span>
+                    <h2 class="text-2xl font-bold text-white">WordPress</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <h4 class="text-blue-400 font-semibold mb-3">Base de Datos</h4>
+                        <div class="code-block">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-sql">CREATE DATABASE wordpress;
+CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'you_secure-password';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <h4 class="text-blue-400 font-semibold mb-3">Virtual Host Apache</h4>
+                        <p class="text-slate-400 text-sm mb-2">Crear <code
+                                class="bg-slate-900 px-2 py-1 rounded">/etc/httpd/conf/extra/httpd-wordpress.conf</code>:
+                        </p>
+                        <div class="code-block mb-3">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/httpd/conf/extra/httpd-wordpress.conf</code></pre>
+                        </div>
+                        <p class="text-slate-400 mb-2">Agregar:</p>
+                        <div class="code-block bg-slate-900/50">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-apache">Alias /wordpress "/usr/share/webapps/wordpress/"
+&lt;Directory "/usr/share/webapps/wordpress/"&gt;
+    AllowOverride All
+    Options FollowSymlinks
+    Require all granted
+&lt;/Directory&gt;</code></pre>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-3">Configurar Apache</h3>
+                        <div class="code-block mb-3">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/httpd/conf/httpd.conf</code></pre>
+                        </div>
+                        <p class="text-slate-400 mb-2">Agregar esta línea al final del archivo:</p>
+                        <div class="code-block bg-slate-900/50">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-apache">Include conf/extra/php-fpm.conf</code></pre>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-3">Corregir Permisos de WordPress</h3>
+                    <div class="code-block">
+                        <button
+                            class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                            onclick="copyCode(this)">Copiar</button>
+                        <pre><code class="language-bash">sudo chown -R http:http /usr/share/webapps/wordpress/
+sudo chmod -R 755 /usr/share/webapps/wordpress/</code></pre>
+                    </div>
+
+                    <div class="info-box p-4 rounded-lg">
+                        <p class="text-blue-300 text-sm">Finalizar instalación en: <code
+                                class="bg-blue-900/50 px-2 py-1 rounded">http://localhost/wordpress</code></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 14 -->
+            <section id="waydroid" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-600/20 text-green-400 flex items-center justify-center font-bold text-lg mr-4">14</span>
+                    <h2 class="text-2xl font-bold text-white">Waydroid</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="warning-box p-4 rounded-lg">
+                        <h4 class="text-yellow-400 font-semibold mb-2">Límites de Recursos (4GB RAM)</h4>
+                        <div class="code-block bg-yellow-900/20">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo mkdir -p /etc/systemd/system/waydroid-container.service.d/
+sudo tee /etc/systemd/system/waydroid-container.service.d/override.conf << EOF
+[Service]
+# Aumentar memoria del contenedor de 2GB a 4GB
+# (50% de RAM física es seguro)
+MemoryMax=4G
+MemoryHigh=3.5G
+
+# Limitar swap (evitar I/O lento)
+MemorySwapMax=512M
+
+# Aumentar CPUs de 2 a 4 cores
+AllowedCPUs=0,1,2,3
+
+# Priorizar I/O (mejora carga de apps)
+IOWeight=500
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now waydroid-container</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-3">LibHoudini (Traducción ARM)</h3>
+                        <div class="code-block">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">cd ~
+git clone https://github.com/casualsnek/waydroid_script
+cd waydroid_script
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
+sudo systemctl stop waydroid-container
+sudo venv/bin/python3 main.py install libhoudini
+sudo systemctl start waydroid-container</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 15 -->
+            <section id="optimizacion" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-lg mr-4">15</span>
+                    <h2 class="text-2xl font-bold text-white">Optimización del Sistema</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                        <h3 class="text-lg font-semibold text-red-400 mb-4">Sysctl (99-master-performance.conf)</h3>
+                        <div class="code-block mb-4">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo nano /etc/sysctl.d/99-master-performance.conf</code></pre>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <h4 class="text-blue-400 font-semibold text-sm">Memoria (16GB) & I/O SSD</h4>
+                                <div class="code-block bg-slate-900/50 mb-4">
+                                    <button
+                                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                        onclick="copyCode(this)">Copiar</button>
+                                    <pre><code class="language-ini"># --- MEMORIA (16GB RAM) I/O & WRITEBACK (SSD Optimizado) ---
+# Evita el swap prematuro y prioriza el uso de RAM física
+vm.swappiness=10
+# Equilibrio: No purgar caché de archivos demasiado rápido (ideal para IDEs/C++)
+vm.vfs_cache_pressure=50
+# Datos en RAM antes de forzar escritura al disco
+vm.dirty_background_ratio=5
+vm.dirty_ratio=15
+vm.dirty_expire_centisecs=300
+vm.dirty_writeback_centisecs=100</code></pre>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <h4 class="text-green-400 font-semibold text-sm">Red</h4>
+                                <div class="code-block bg-slate-900/50 mb-4">
+                                    <button
+                                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                        onclick="copyCode(this)">Copiar</button>
+                                    <pre><code class="language-ini"># --- RED & CONECTIVIDAD (Dev + Waydroid/Server) ---
+# Manejo de ráfagas de conexiones locales
+net.core.somaxconn=1024
+net.core.netdev_max_backlog=65536
+net.core.default_qdisc=fq_codel
+net.ipv4.tcp_fastopen=3
+# Necesario para contenedores/Waydroid
+net.ipv4.ip_forward=1</code></pre>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <h4 class="text-purple-400 font-semibold text-sm">Scheduler</h4>
+                                <div class="code-block bg-slate-900/50 mb-4">
+                                    <button
+                                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                        onclick="copyCode(this)">Copiar</button>
+                                    <pre><code class="language-ini"># --- SCHEDULER (CachyOS BORE / Deckify) ---
+# Optimización de estados de energía y latencia de hilos
+kernel.sched_cstate_aware=1
+kernel.sched_child_runs_first=0
+kernel.sched_tunable_scaling=1
+kernel.numa_balancing=0</code></pre>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <h4 class="text-yellow-400 font-semibold text-sm">Recursos de Usuario</h4>
+                                <div class="code-block bg-slate-900/50 mb-4">
+                                    <button
+                                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                        onclick="copyCode(this)">Copiar</button>
+                                    <pre><code class="language-ini"># --- RECURSOS DE USUARIO (IDEs & File Watching) ---
+# Evita errores de "too many open files" en VS Code/Compilaciones
+fs.inotify.max_user_watches=524288
+fs.inotify.max_user_instances=512</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-3">Reiniciar Servicios</h3>
+                        <div class="mt-4 code-block">
+                            <button
+                                class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                                onclick="copyCode(this)">Copiar</button>
+                            <pre><code class="language-bash">sudo sysctl --system</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/30 p-4 rounded-lg border border-slate-700">
+                        <h4 class="text-white font-semibold mb-2">Mixxx (Alta Prioridad)</h4>
+                        <p class="text-yellow-400 text-sm mb-2">⚠️ Usar en la línea Argumentos de órdenes del Acceso
+                            Directo</p>
+                        <code
+                            class="text-sm text-green-400 font-mono mb-2">-c 'pasuspender -- taskset -c 1-2 chrt -f 95 mixxx || mixxx'</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 16 -->
+            <section id="firefox" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-600/20 text-orange-400 flex items-center justify-center font-bold text-lg mr-4">16</span>
+                    <h2 class="text-2xl font-bold text-white">Firefox - Configuración Avanzada</h2>
+                </div>
+
+                <div class="warning-box p-4 rounded-lg mb-6">
+                    <p class="text-yellow-200 text-sm">En Ajustes desactivar <strong>"Rendimiento automático"</strong>.
+                        Acceder a
+                        <code class="bg-yellow-900/50 px-2 py-1 rounded">about:config</code>
+                    </p>
+                </div>
+
+                <!-- Tabla 1: Gráficos y Renderizado -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-orange-400 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        Gráficos y Renderizado
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-300">
+                            <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-l-lg">Preferencia</th>
+                                    <th class="px-4 py-3">Valor</th>
+                                    <th class="px-4 py-3 rounded-r-lg">Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        gfx.webrender.all
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-green-400">true</td>
+                                    <td class="px-4 py-3">Forzar WebRender (Motor gráfico moderno)</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        media.ffmpeg.vaapi.enabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-green-400">true</td>
+                                    <td class="px-4 py-3">Activar decodificación de video por hardware (VA-API)</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        media.av1.enabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-green-400">true</td>
+                                    <td class="px-4 py-3">Codecs modernos AV1</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        media.ffvpx.enabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Desactivar decoder interno para forzar el del sistema (VA-API)
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        media.rdd-vpx.enabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Lo mismo para VP9/VP8</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabla 2: Rendimiento (RAM) -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-purple-400 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z">
+                            </path>
+                        </svg>
+                        Rendimiento (RAM)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-300">
+                            <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-l-lg">Preferencia</th>
+                                    <th class="px-4 py-3">Valor</th>
+                                    <th class="px-4 py-3 rounded-r-lg">Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        browser.cache.disk.enable
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Desactivar caché en disco (SSD agradecido)</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        browser.cache.memory.enable
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-green-400">true</td>
+                                    <td class="px-4 py-3">Forzar caché en RAM</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        browser.cache.memory.capacity
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-yellow-400">1048576</td>
+                                    <td class="px-4 py-3">1GB asignado (en KB)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabla 3: Privacidad y Seguridad -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-red-400 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                        Privacidad y Seguridad
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-300">
+                            <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-l-lg">Preferencia</th>
+                                    <th class="px-4 py-3">Valor</th>
+                                    <th class="px-4 py-3 rounded-r-lg">Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        privacy.trackingprotection.enabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-green-400">true</td>
+                                    <td class="px-4 py-3">Protección contra rastreo (Modo Estricto moderno)</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        network.cookie.cookieBehavior
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-yellow-400">5</td>
+                                    <td class="px-4 py-3">Total Cookie Protection (Aisla cookies por sitio
+                                        dinámicamente)</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        toolkit.telemetry.enabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Apagar Telemetría (Cero datos a Mozilla)</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        toolkit.telemetry.archive.enabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Desactivar archivo de telemetría</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        browser.newtabpage.activity-stream.feeds.telemetry
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Telemetría de new tab page</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        browser.ping-centre.telemetry
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Desactivar Ping Centre</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        datareporting.healthreport.uploadEnabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Desactivar reportes de salud</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabla 4: Red -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                        DNS y Conexiones
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-300">
+                            <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-l-lg">Preferencia</th>
+                                    <th class="px-4 py-3">Valor</th>
+                                    <th class="px-4 py-3 rounded-r-lg">Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        network.dns.disablePrefetch
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Mantener prefetch DNS para velocidad</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        network.http.max-persistent-connections-per-server
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-yellow-400">10</td>
+                                    <td class="px-4 py-3">Conexiones persistentes por servidor</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30 transition">
+                                    <td class="px-4 py-3 font-mono text-blue-400 relative group cursor-pointer"
+                                        onclick="copyCell(this)">
+                                        network.http.pacing.requests.enabled
+                                        <button
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none"
+                                            title="Copiar">📋</button>
+                                    </td>
+                                    <td class="px-4 py-3 text-red-400">false</td>
+                                    <td class="px-4 py-3">Desactivar pacing de requests</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 17 -->
+            <section id="accesos" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-600/20 text-gray-400 flex items-center justify-center font-bold text-lg mr-4">17</span>
+                    <h2 class="text-2xl font-bold text-white">Accesos Directos</h2>
+                </div>
+
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 mb-6">
+                    <h3 class="text-lg font-semibold text-blue-400 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Configurar Nuevos Accesos Directos
+                    </h3>
+                    <p class="text-slate-400 text-sm mb-4">Configuración de archivos .desktop para aplicaciones y servicios web.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Citron -->
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-red-500/50 transition-colors">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold text-lg">Citron</h4>
+                                    <p class="text-slate-400 text-sm">Nintendo Switch Homebrew Emulator</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-red-500/20 text-red-400 text-xs rounded-full font-medium">AppImage</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Nombre:</span>
+                                <span class="text-slate-300 md:col-span-3 font-mono">Citron</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Nombre Genérico:</span>
+                                <span class="text-slate-300 md:col-span-3">Nintendo Switch Homebrew Emulator</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Comentario:</span>
+                                <span class="text-slate-300 md:col-span-3 italic">The most advanced Nintendo Switch emulator</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm items-center">
+                                <span class="text-slate-500 font-medium">Programa:</span>
+                                <div class="md:col-span-3 flex items-center gap-2">
+                                    <code class="text-xs text-green-400 bg-slate-900/50 px-2 py-1 rounded flex-1 break-all relative group cursor-pointer" onclick="copyToClipboard(this)">
+                                        /home/xandnew/.local/share/citron/Citron-0.11.0-anylinux-x86_64_v3.AppImage
+                                        <button class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-green-600 text-white text-xs px-2 py-1 rounded pointer-events-none" title="Copiar">📋</button>
+                                    </code>
+                                    <span class="text-slate-500 text-xs">(o usar el Botón de Búsqueda)</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Argumentos:</span>
+                                <span class="text-slate-500 md:col-span-3 italic text-xs">Sin argumentos adicionales</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Mail -->
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-red-500/50 transition-colors">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold text-lg">Google Mail</h4>
+                                    <p class="text-slate-400 text-sm">Gmail</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-red-500/20 text-red-400 text-xs rounded-full font-medium">Web</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Nombre:</span>
+                                <span class="text-slate-300 md:col-span-3 font-mono">Google Mail</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Nombre Genérico:</span>
+                                <span class="text-slate-300 md:col-span-3">Gmail</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Comentario:</span>
+                                <span class="text-slate-300 md:col-span-3">Servicio de correo electrónico proporcionado por Google</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm items-center">
+                                <span class="text-slate-500 font-medium">Programa:</span>
+                                <code class="text-xs text-blue-400 bg-slate-900/50 px-2 py-1 rounded md:col-span-3 font-mono">xdg-open</code>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm items-center">
+                                <span class="text-slate-500 font-medium">Argumentos:</span>
+                                <div class="md:col-span-3">
+                                    <code class="text-xs text-yellow-400 bg-slate-900/50 px-2 py-1 rounded w-full block relative group cursor-pointer" onclick="copyToClipboard(this)">
+                                        'https://mail.google.com/mail/u/0/#inbox'
+                                        <button class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-yellow-600 text-white text-xs px-2 py-1 rounded pointer-events-none" title="Copiar">📋</button>
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Microsoft Outlook -->
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-colors">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold text-lg">Microsoft Outlook</h4>
+                                    <p class="text-slate-400 text-sm">Outlook</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full font-medium">Web</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Nombre:</span>
+                                <span class="text-slate-300 md:col-span-3 font-mono">Microsoft Outlook</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Nombre Genérico:</span>
+                                <span class="text-slate-300 md:col-span-3">Outlook</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Comentario:</span>
+                                <span class="text-slate-300 md:col-span-3">Servicio de correo electrónico proporcionado por Microsoft</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm items-center">
+                                <span class="text-slate-500 font-medium">Programa:</span>
+                                <code class="text-xs text-blue-400 bg-slate-900/50 px-2 py-1 rounded md:col-span-3 font-mono">xdg-open</code>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm items-center">
+                                <span class="text-slate-500 font-medium">Argumentos:</span>
+                                <div class="md:col-span-3">
+                                    <code class="text-xs text-yellow-400 bg-slate-900/50 px-2 py-1 rounded w-full block relative group cursor-pointer" onclick="copyToClipboard(this)">
+                                        'https://outlook.live.com/mail/0/?login_hint=xanders80%40outlook.es'
+                                        <button class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-yellow-600 text-white text-xs px-2 py-1 rounded pointer-events-none" title="Copiar">📋</button>
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Microsoft 365 Copilot -->
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-indigo-500/50 transition-colors">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold text-lg">Microsoft 365 Copilot</h4>
+                                    <p class="text-slate-400 text-sm">M365</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 text-xs rounded-full font-medium">Web</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Nombre:</span>
+                                <span class="text-slate-300 md:col-span-3 font-mono">Microsoft 365 Copilot</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Nombre Genérico:</span>
+                                <span class="text-slate-300 md:col-span-3">M365</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                                <span class="text-slate-500 font-medium">Comentario:</span>
+                                <span class="text-slate-300 md:col-span-3">Suite integral de productividad y servicios en la nube</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm items-center">
+                                <span class="text-slate-500 font-medium">Programa:</span>
+                                <code class="text-xs text-blue-400 bg-slate-900/50 px-2 py-1 rounded md:col-span-3 font-mono">xdg-open</code>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm items-center">
+                                <span class="text-slate-500 font-medium">Argumentos:</span>
+                                <div class="md:col-span-3">
+                                    <code class="text-xs text-yellow-400 bg-slate-900/50 px-2 py-1 rounded w-full block relative group cursor-pointer" onclick="copyToClipboard(this)">
+                                        'https://m365.cloud.microsoft/search/?auth=1&origindomain=microsoft365'
+                                        <button class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-yellow-600 text-white text-xs px-2 py-1 rounded pointer-events-none" title="Copiar">📋</button>
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nota -->
+                <div class="info-box p-4 rounded-lg mt-6">
+                    <p class="text-blue-300 text-sm flex items-center">
+                        <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Ubicación estándar para archivos .desktop: <code class="bg-blue-900/50 px-2 py-1 rounded ml-2 font-mono text-xs">~/.local/share/applications/</code>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Función adicional para copiar -->
+            <script>
+                function copyToClipboard(element) {
+                    const text = element.childNodes[0].textContent.trim().replace(/['"]/g, '');
+                    navigator.clipboard.writeText(text).then(() => {
+                        const originalBg = element.style.backgroundColor;
+                        element.style.backgroundColor = 'rgba(59, 130, 246, 0.3)';
+                        setTimeout(() => {
+                            element.style.backgroundColor = originalBg;
+                        }, 300);
+                    });
+                }
+            </script>
+
+            <!-- Footer Info -->
+            <div class="glass-panel rounded-2xl p-6 mt-12 border-t border-slate-700">
+                <div class="grid md:grid-cols-3 gap-4 text-center text-sm text-slate-400">
+                    <div>
+                        <span class="block text-slate-500 uppercase tracking-wider text-xs mb-1">Usuario</span>
+                        <span class="text-white font-semibold">Xanders80</span>
+                    </div>
+                    <div>
+                        <span class="block text-slate-500 uppercase tracking-wider text-xs mb-1">Kernel</span>
+                        <span class="text-blue-400 font-semibold">deckify-lto</span>
+                    </div>
+                    <div>
+                        <span class="block text-slate-500 uppercase tracking-wider text-xs mb-1">Sistema</span>
+                        <span class="text-purple-400 font-semibold">CachyOS (Arch-based)</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Configuración de Highlight.js (si lo usas)
+        hljs.highlightAll();
+
+        // Funcionalidad de copiar código
+        function copyCode(btn) {
+            const code = btn.parentElement.querySelector('code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const original = btn.innerText;
+                btn.innerText = '¡Copiado!';
+                btn.classList.add('bg-green-600');
+                setTimeout(() => {
+                    btn.innerText = original;
+                    btn.classList.remove('bg-green-600');
+                }, 2000);
+            });
+        }
+
+        // SOLUCIÓN: Scroll suave sin recargar página
+        document.querySelectorAll('.toc-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault(); // Previene la carga de nueva página
+
+                const targetId = this.getAttribute('href').substring(1); // Obtiene el ID sin el #
+                const targetElement = document.getElementById(targetId);
+
+                if (targetElement) {
+                    // Scroll suave al elemento
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+                    // Actualiza la URL sin recargar (opcional, para que el usuario pueda copiar el link)
+                    history.pushState(null, null, '#' + targetId);
+                }
+            });
+        });
+
+        // ScrollSpy para resaltar el item activo en el menú
+        const sections = document.querySelectorAll('section[id]');
+        const tocLinks = document.querySelectorAll('.toc-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Animación suave al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.section-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        function copyCell(cell) {
+            const text = cell.childNodes[0].textContent.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                // Feedback visual temporal
+                const originalBg = cell.style.backgroundColor;
+                cell.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+                setTimeout(() => {
+                    cell.style.backgroundColor = originalBg;
+                }, 300);
+            });
+        }
+    </script>
+</body>
+
+</html>
