@@ -163,37 +163,39 @@
                     <a href="#paquetes"
                         class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">4. Instalación
                         Paquetes</a>
+                    <a href="#gpu-booster"
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">5. GPU-Booster</a>
                     <a href="#firewall"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">5. Firewall</a>
-                    <a href="#kvm" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">6.
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">6. Firewall</a>
+                    <a href="#kvm" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">7.
                         Virtualización KVM</a>
-                    <a href="#git" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">7.
+                    <a href="#git" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">8.
                         Git Config</a>
                     <a href="#hardware"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">8. Hardware
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">9. Hardware
                         Intel</a>
                     <a href="#dotnet"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">9. .NET
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">10. .NET
                         Core</a>
-                    <a href="#php" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">10.
+                    <a href="#php" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">11.
                         PHP & Apache</a>
                     <a href="#mariadb"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">11. MariaDB</a>
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">12. MariaDB</a>
                     <a href="#postgresql"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">12.
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">13.
                         PostgreSQL</a>
                     <a href="#wordpress"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">13.
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">14.
                         WordPress</a>
                     <a href="#waydroid"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">14.
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">15.
                         Waydroid</a>
                     <a href="#optimizacion"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">15.
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">16.
                         Optimización</a>
                     <a href="#firefox"
-                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">16. Firefox</a>
-                    <a href="#accesos" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">17. Accesos Directos</a>
+                        class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">17. Firefox</a>
+                    <a href="#accesos" class="toc-link block py-2 px-3 rounded text-sm text-slate-300 hover:text-white">18. Accesos Directos</a>
                 </nav>
             </div>
         </aside>
@@ -447,10 +449,65 @@ sudo pacman -Syyu</code></pre>
             </section>
 
             <!-- Sección 5 -->
+            <section id="gpu-booster" class="section-card glass-panel rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <span
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center font-bold text-lg mr-4">5</span>
+                    <h2 class="text-2xl font-bold text-white">GPU-Booster en CachyOS</h2>
+                </div>
+
+                <h3 class="text-lg font-semibold text-white mb-3">Iniciar servicio de sistema (como root)</h3>
+                <div class="code-block mb-6">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash"># Habilitar e iniciar el servicio de sistema
+sudo systemctl enable --now dmemcg-booster-system
+
+# Verificar estado
+systemctl status dmemcg-booster-system --no-pager</code></pre>
+                </div>
+
+                <h3 class="text-lg font-semibold text-white mb-3">Iniciar servicios de usuario (como tu usuario, sin sudo)</h3>
+                <div class="code-block mb-6">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash"># Habilitar e iniciar servicios de usuario
+systemctl --user enable --now dmemcg-booster-user
+systemctl --user enable --now plasma-foreground-booster
+
+# Verificar estados
+systemctl --user status dmemcg-booster-user --no-pager
+systemctl --user status plasma-foreground-booster --no-pager</code></pre>
+                </div>
+
+                <h3 class="text-lg font-semibold text-white mb-3">Verificar que todo funciona</h3>
+                <div class="code-block mb-6">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash"># Verificación completa
+echo "=== Servicios de Sistema ==="
+systemctl is-active dmemcg-booster-system && echo "✅ dmemcg-booster-system activo" || echo "❌ inactivo"
+
+echo -e "\n=== Servicios de Usuario ==="
+systemctl --user is-active dmemcg-booster-user && echo "✅ dmemcg-booster-user activo" || echo "❌ inactivo"
+systemctl --user is-active plasma-foreground-booster && echo "✅ plasma-foreground-booster activo" || echo "❌ inactivo"
+
+echo -e "\n=== Cgroup dmem ==="
+test -d /sys/fs/cgroup/dmem && echo "✅ /sys/fs/cgroup/dmem existe" && ls /sys/fs/cgroup/dmem | head -5 || echo "❌ No montado"
+
+echo -e "\n=== Procesos ==="
+ps aux | grep -i booster | grep -v grep</code></pre>
+                </div>
+            </section>
+
+            <!-- Sección 6 -->
             <section id="firewall" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-lg mr-4">5</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-lg mr-4">6</span>
                     <h2 class="text-2xl font-bold text-white">Configuración de Firewall</h2>
                 </div>
 
@@ -507,11 +564,11 @@ sudo systemctl enable ufw</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 6 -->
+            <!-- Sección 7 -->
             <section id="kvm" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-lg mr-4">6</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-lg mr-4">7</span>
                     <h2 class="text-2xl font-bold text-white">Virtualización KVM</h2>
                 </div>
 
@@ -582,11 +639,11 @@ reboot</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 7 -->
+            <!-- Sección 8 -->
             <section id="git" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-500/20 text-gray-400 flex items-center justify-center font-bold text-lg mr-4">7</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-500/20 text-gray-400 flex items-center justify-center font-bold text-lg mr-4">8</span>
                     <h2 class="text-2xl font-bold text-white">Configuración Git</h2>
                 </div>
                 <div class="code-block">
@@ -599,11 +656,11 @@ git config --global --list</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 8 -->
+            <!-- Sección 9 -->
             <section id="hardware" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-lg mr-4">8</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-lg mr-4">9</span>
                     <h2 class="text-2xl font-bold text-white">Aceleración por Hardware Intel</h2>
                 </div>
                 <h3 class="text-lg font-semibold text-white mb-3">Validar Aceleración por Hardware Intel</h3>
@@ -623,11 +680,11 @@ source /etc/profile.d/libva.sh</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 9 -->
+            <!-- Sección 10 -->
             <section id="dotnet" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg mr-4">9</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg mr-4">10</span>
                     <h2 class="text-2xl font-bold text-white">.NET Core</h2>
                 </div>
                 <h3 class="text-lg font-semibold text-white mb-3">Validar instalación de .NET Core</h3>
@@ -647,11 +704,11 @@ source /etc/profile.d/libva.sh</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 10 -->
+            <!-- Sección 11 -->
             <section id="php" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center font-bold text-lg mr-4">10</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center font-bold text-lg mr-4">11</span>
                     <h2 class="text-2xl font-bold text-white">PHP y Apache</h2>
                 </div>
 
@@ -752,11 +809,11 @@ sudo systemctl enable --now php-fpm httpd</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 11 -->
+            <!-- Sección 12 -->
             <section id="mariadb" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-600/20 text-yellow-400 flex items-center justify-center font-bold text-lg mr-4">11</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-600/20 text-yellow-400 flex items-center justify-center font-bold text-lg mr-4">12</span>
                     <h2 class="text-2xl font-bold text-white">MariaDB</h2>
                 </div>
                 <h3 class="text-lg font-semibold text-white mb-3">Configuración de MariaDB - 1° Vez</h3>
@@ -797,11 +854,11 @@ key_buffer_size = 256M</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 12 -->
+            <!-- Sección 13 -->
             <section id="postgresql" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-800/20 text-blue-300 flex items-center justify-center font-bold text-lg mr-4">12</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-800/20 text-blue-300 flex items-center justify-center font-bold text-lg mr-4">13</span>
                     <h2 class="text-2xl font-bold text-white">PostgreSQL</h2>
                 </div>
                 <h3 class="text-lg font-semibold text-white mb-3">Configuración PostgreSQL - 1° Vez</h3>
@@ -857,11 +914,11 @@ ALTER USER postgres WITH PASSWORD 'you_secure_password';</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 13 -->
+            <!-- Sección 14 -->
             <section id="wordpress" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg mr-4">13</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg mr-4">14</span>
                     <h2 class="text-2xl font-bold text-white">WordPress</h2>
                 </div>
 
@@ -934,11 +991,11 @@ sudo chmod -R 755 /usr/share/webapps/wordpress/</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 14 -->
+            <!-- Sección 15 -->
             <section id="waydroid" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-600/20 text-green-400 flex items-center justify-center font-bold text-lg mr-4">14</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-600/20 text-green-400 flex items-center justify-center font-bold text-lg mr-4">15</span>
                     <h2 class="text-2xl font-bold text-white">Waydroid</h2>
                 </div>
 
@@ -991,11 +1048,11 @@ sudo systemctl start waydroid-container</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 15 -->
+            <!-- Sección 16 -->
             <section id="optimizacion" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-lg mr-4">15</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-lg mr-4">16</span>
                     <h2 class="text-2xl font-bold text-white">Optimización del Sistema</h2>
                 </div>
 
@@ -1101,11 +1158,11 @@ fs.inotify.max_user_instances=512</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 16 -->
+            <!-- Sección 17 -->
             <section id="firefox" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <span
-                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-600/20 text-orange-400 flex items-center justify-center font-bold text-lg mr-4">16</span>
+                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-600/20 text-orange-400 flex items-center justify-center font-bold text-lg mr-4">17</span>
                     <h2 class="text-2xl font-bold text-white">Firefox - Configuración Avanzada</h2>
                 </div>
 
@@ -1417,10 +1474,10 @@ fs.inotify.max_user_instances=512</code></pre>
                 </div>
             </section>
 
-            <!-- Sección 17 -->
+            <!-- Sección 18 -->
             <section id="accesos" class="section-card glass-panel rounded-2xl p-8">
                 <div class="flex items-center mb-6">
-                    <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-600/20 text-gray-400 flex items-center justify-center font-bold text-lg mr-4">17</span>
+                    <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-600/20 text-gray-400 flex items-center justify-center font-bold text-lg mr-4">18</span>
                     <h2 class="text-2xl font-bold text-white">Accesos Directos</h2>
                 </div>
 
