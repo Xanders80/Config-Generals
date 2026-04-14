@@ -456,6 +456,83 @@ sudo pacman -Syyu</code></pre>
                     <h2 class="text-2xl font-bold text-white">GPU-Booster en CachyOS</h2>
                 </div>
 
+                <h3 class="text-lg font-semibold text-white mb-3">Crear servicio para habilitar dmem en cgroup v2</h3>
+                <div class="code-block mb-3">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo nano /etc/systemd/system/dmemcg-booster-v2.service</code></pre>
+                </div>
+                <p class="text-slate-400 mb-2">Agregar el siguiente contenido:</p>
+                <div class="code-block bg-slate-900/50 mb-4">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-ini">[Unit]
+Description=Enable Device Memory Controller for Cgroup v2
+After=systemd-modules-load.service
+Before=dmemcg-booster-system.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+# Verificar que estamos en cgroup v2 y habilitar dmem
+ExecStart=/bin/bash -c '\
+    if [ "$(stat -fc %T /sys/fs/cgroup/)" = "cgroup2fs" ]; then \
+        echo "+dmem" &gt; /sys/fs/cgroup/cgroup.subtree_control 2&gt;/dev/null &amp;&amp; \
+        mkdir -p /sys/fs/cgroup/dmem &amp;&amp; \
+        echo "dmem controller enabled in cgroup v2"; \
+    else \
+        # Fallback a cgroup v1
+        mkdir -p /sys/fs/cgroup/dmem &amp;&amp; \
+        mount -t cgroup -o dmem none /sys/fs/cgroup/dmem 2&gt;/dev/null || true; \
+    fi'
+
+ExecStop=/bin/bash -c '\
+    if [ "$(stat -fc %T /sys/fs/cgroup/)" = "cgroup2fs" ]; then \
+        rmdir /sys/fs/cgroup/dmem 2&gt;/dev/null || true; \
+    else \
+        umount /sys/fs/cgroup/dmem 2&gt;/dev/null || true; \
+    fi'
+
+[Install]
+WantedBy=sysinit.target</code></pre>
+                </div>
+                <p class="text-slate-400 mb-2">Habilitar el servicio:</p>
+                <div class="code-block mb-6">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo systemctl daemon-reload
+sudo systemctl enable --now dmemcg-booster-v2.service</code></pre>
+                </div>
+
+                <h3 class="text-lg font-semibold text-white mb-3">Crear drop-in override para dmemcg-booster-system</h3>
+                <div class="code-block mb-3">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo mkdir -p /etc/systemd/system/dmemcg-booster-system.service.d
+sudo nano /etc/systemd/system/dmemcg-booster-system.service.d/override.conf</code></pre>
+                </div>
+                <p class="text-slate-400 mb-2">Agregar:</p>
+                <div class="code-block bg-slate-900/50 mb-4">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-ini">[Unit]
+After=dmemcg-booster-v2.service
+Requires=dmemcg-booster-v2.service</code></pre>
+                </div>
+                <p class="text-slate-400 mb-2">Aplicar cambios:</p>
+                <div class="code-block mb-6">
+                    <button
+                        class="copy-btn absolute top-3 right-3 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition"
+                        onclick="copyCode(this)">Copiar</button>
+                    <pre><code class="language-bash">sudo systemctl daemon-reload</code></pre>
+                </div>
+
                 <h3 class="text-lg font-semibold text-white mb-3">Iniciar servicio de sistema (como root)</h3>
                 <div class="code-block mb-6">
                     <button
